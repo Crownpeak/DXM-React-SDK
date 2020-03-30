@@ -1,0 +1,12 @@
+{
+  "name": "DXM-React-SDK",
+  "version": "1.0.0",
+  "description": "Crownpeak DXM React SDK.",
+  "repository": "https://github.com/Crownpeak/DXM-React-SDK",
+  "author": "Crownpeak Technology, inc.",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4"
+  }
+}
