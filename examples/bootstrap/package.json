@@ -2,7 +2,7 @@
   "name": "DXM-React-SDK",
   "version": "1.0.0",
   "description": "Crownpeak DXM React SDK.",
-  "main": "index.js",
+  "main": "./js/index.js",
   "repository": "https://github.com/Crownpeak/DXM-React-SDK",
   "author": "Crownpeak Technology, inc.",
   "license": "MIT",
@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react-dom": "^15.5.4",
+    "react-native-dotenv": "^0.2.0"
   },
   "devDependencies": {
     "babel": "^6.23.0",

@@ -2,6 +2,7 @@
   "presets": [
     "stage-2",
     "react",
-    "react-hmre"
+    "react-hmre",
+    "react-native-dotenv"
   ]
 }

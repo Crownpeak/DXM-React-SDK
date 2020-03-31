@@ -3,7 +3,7 @@ var webpack = require('webpack');
 
 module.exports = {
 	entry: [
-		path.join(__dirname, '/index.js')
+		path.join(__dirname, '/js/index.js')
 	],
 	output: {
 		path: path.join(__dirname, '/js/'),
