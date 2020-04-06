@@ -10,9 +10,12 @@
     "start": "node_modules/.bin/webpack-dev-server --progress --inline --hot"
   },
   "dependencies": {
+    "history": "^4.10.1",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
-    "react-native-dotenv": "^0.2.0"
+    "react-native-dotenv": "^0.2.0",
+    "react-router": "^5.1.2",
+    "react-router-config": "^5.1.1"
   },
   "devDependencies": {
     "babel": "^6.23.0",
