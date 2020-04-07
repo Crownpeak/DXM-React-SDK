@@ -11,11 +11,13 @@
   },
   "dependencies": {
     "history": "^4.10.1",
+    "json-loader": "^0.5.7",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-native-dotenv": "^0.2.0",
     "react-router": "^5.1.2",
-    "react-router-config": "^5.1.1"
+    "react-router-config": "^5.1.1",
+    "react-router-dom": "^5.1.2"
   },
   "devDependencies": {
     "babel": "^6.23.0",

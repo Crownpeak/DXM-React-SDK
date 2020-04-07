@@ -1,0 +1,11 @@
+[
+  {
+    "path": "/",
+    "exact": true,
+    "component": "BlogPage"
+  },
+  {
+    "path": "/posts/:month",
+    "component": "BlogPage"
+  }
+]

@@ -11,7 +11,7 @@ export default class Header extends CmsComponent
                         <a className="text-muted" href="#">Subscribe</a>
                     </div>
                     <div className="col-4 text-center">
-                        <a className="blog-header-logo text-dark" href="#">Large</a>
+                        <a className="blog-header-logo text-dark" href="#">{this.props.month}</a>
                     </div>
                     <div className="col-4 d-flex justify-content-end align-items-center">
                         <a className="text-muted" href="#">

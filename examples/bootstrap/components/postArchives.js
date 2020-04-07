@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import CmsComponent from '../../../common/classes/cmsComponent';
 
 export default class PostArchives extends CmsComponent
@@ -7,18 +8,18 @@ export default class PostArchives extends CmsComponent
     {
         super (props);
         this.months = [
-            "Jan 2019",
-            "Feb 2019",
-            "Mar 2019",
-            "April 2019",
-            "May 2019",
-            "June 2019",
-            "July 2019",
-            "August 2019",
-            "September 2019",
-            "October 2019",
-            "November 2019",
-            "December 2019"
+            "Jan",
+            "Feb",
+            "Mar",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
         ];
     }
 
@@ -28,7 +29,7 @@ export default class PostArchives extends CmsComponent
                 <h4 className="font-italic">Archives</h4>
                 <ol className="list-unstyled mb-0">
                     {this.months.map((month) => {
-                        return <li key={month.toString()}><a href="#">{ month }</a></li>
+                        return <li key={month.toString()}><Link to={`/posts/${month.toString()}`}>{ month }</Link></li>
                     })}
                 </ol>
             </div>

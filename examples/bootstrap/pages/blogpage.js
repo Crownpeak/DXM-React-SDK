@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import CmsPage from '../../../common/classes/cmsPage';
 import Header from "../components/header";
 import TopicList from "../components/topicList";
@@ -14,7 +14,7 @@ export default class BlogPage extends CmsPage
         return (
             <div>
                 <div className="container">
-                    <Header/>
+                    <Header month={this.props.match.params.month}/>
                     <TopicList/>
                     <div className="jumbotron p-3 p-md-5 text-white rounded bg-dark">
                         <FeaturedPost/>
