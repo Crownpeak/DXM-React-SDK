@@ -29,7 +29,7 @@ export default class PostArchives extends CmsComponent
                 <h4 className="font-italic">Archives</h4>
                 <ol className="list-unstyled mb-0">
                     {this.months.map((month) => {
-                        return <li key={month.toString()}><Link to={`/posts/${month.toString()}`}>{ month }</Link></li>
+                        return <li key={month.toString()}><Link to={`/posts/months/${month.toString()}`}>{ month }</Link></li>
                     })}
                 </ol>
             </div>

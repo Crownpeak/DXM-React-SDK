@@ -2,14 +2,12 @@ import React from 'react';
 import CmsComponent from '../../../common/classes/cmsComponent';
 import CmsField from "../../../common/classes/cmsField";
 import CmsFieldTypes from "../../../common/enum/cmsFieldTypes";
-import CmsDataSources from "../../../common/enum/cmsDataSource";
 
 export default class BlogPost extends CmsComponent
 {
     constructor(props)
     {
         super(props);
-        this.cmsDataSource = CmsDataSources.DYNAMIC;
         this.post_title = new CmsField("Post_Title", CmsFieldTypes.TEXT);
         this.post_date = new CmsField("Post_Date", CmsFieldTypes.DATE);
     }

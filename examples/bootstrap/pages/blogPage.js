@@ -7,10 +7,17 @@ import SecondaryPost from "../components/secondaryPost";
 import BlogPost from "../components/blogPost";
 import PostArchives from "../components/postArchives";
 import Footer from "../components/footer";
+import CmsDataSource from "../../../common/enum/cmsDataSource";
 
 export default class BlogPage extends CmsPage
 {
+    constructor(props) {
+        super(props);
+        this.cmsDataSource = CmsDataSource.DYNAMIC;
+    }
+
     render() {
+        super.render();
         return (
             <div>
                 <div className="container">

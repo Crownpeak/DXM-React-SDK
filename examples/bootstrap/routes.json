@@ -2,10 +2,17 @@
   {
     "path": "/",
     "exact": true,
-    "component": "BlogPage"
+    "component": "BlogPage",
+    "cmsassetid": "12345"
   },
   {
-    "path": "/posts/:month",
-    "component": "BlogPage"
+    "path": "/posts/months/:month",
+    "component": "BlogPage",
+    "cmsassetid": "23456"
+  },
+  {
+    "path": "/posts/badger",
+    "component": "BlogPage",
+    "cmsassetid": "34567"
   }
 ]
