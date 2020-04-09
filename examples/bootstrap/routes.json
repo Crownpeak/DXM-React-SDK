@@ -3,16 +3,11 @@
     "path": "/",
     "exact": true,
     "component": "BlogPage",
-    "cmsassetid": "12345"
+    "cmsassetid": "261377"
   },
   {
     "path": "/posts/months/:month",
     "component": "BlogPage",
     "cmsassetid": "23456"
-  },
-  {
-    "path": "/posts/badger",
-    "component": "BlogPage",
-    "cmsassetid": "34567"
   }
 ]

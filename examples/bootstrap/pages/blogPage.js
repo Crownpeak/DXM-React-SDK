@@ -1,5 +1,4 @@
 import React from 'react'
-import CmsPage from '../../../common/classes/cmsPage';
 import Header from "../components/header";
 import TopicList from "../components/topicList";
 import FeaturedPost from "../components/featuredPost";
@@ -7,15 +6,11 @@ import SecondaryPost from "../components/secondaryPost";
 import BlogPost from "../components/blogPost";
 import PostArchives from "../components/postArchives";
 import Footer from "../components/footer";
-import CmsDataSource from "../../../common/enum/cmsDataSource";
+import CmsStaticPage from "../../../common/classes/pages/cmsStaticPage";
+import CmsDynamicPage from "../../../common/classes/pages/cmsDynamicPage";
 
-export default class BlogPage extends CmsPage
+export default class BlogPage extends CmsStaticPage
 {
-    constructor(props) {
-        super(props);
-        this.cmsDataSource = CmsDataSource.DYNAMIC;
-    }
-
     render() {
         super.render();
         return (

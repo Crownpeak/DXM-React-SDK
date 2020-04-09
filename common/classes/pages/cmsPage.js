@@ -1,7 +1,6 @@
 import React from 'react';
-import CmsCore from "./cmsCore";
-import Routing from "../../examples/bootstrap/js/routing";
-import CmsDataProvider from "./DataProviders/cmsDataProvider";
+import CmsCore from "../cmsCore";
+import Routing from "../../../examples/bootstrap/js/routing";
 
 export default class CmsPage extends CmsCore {
     constructor(props) {
@@ -9,10 +8,9 @@ export default class CmsPage extends CmsCore {
         if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
     }
 
-    render()
+    async render ()
     {
-        const cmsDataProvider = CmsDataProvider.getProvider(this.cmsDataSource);
-        cmsDataProvider.getData(this.cmsAssetId);
+        this.cmsDataProvider.getData(this.cmsAssetId);
         window.cmsDataCache.cmsAssetId = this.cmsAssetId;
     }
 }
