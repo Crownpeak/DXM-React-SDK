@@ -13,6 +13,5 @@ export default class CmsCore extends React.Component
             cmsStaticDataLocation:cmsStaticDataLocation,
             cmsDynamicDataLocation:cmsDynamicDataLocation
         };
-
     }
 }
