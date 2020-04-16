@@ -1,5 +1,5 @@
 import React from 'react';
-import CmsCore from "./cmsCore";
+import CmsCore from "../common/cmsCore";
 
 export default class CmsComponent extends CmsCore {
     constructor(props) {

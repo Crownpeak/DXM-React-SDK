@@ -16,10 +16,10 @@ export default class SecondaryPost extends CmsComponent
                     <div className="card-body d-flex flex-column align-items-start">
                         <strong className="d-inline-block mb-2 text-primary">World</strong>
                         <h3 className="mb-0">
-                            <a className="text-dark" href="#">{ this.post_title.value() }</a>
+                            <a className="text-dark" href="#">{ this.post_title }</a>
                         </h3>
-                        <div className="mb-1 text-muted">{ this.post_date.value() }</div>
-                        <p className="card-text mb-auto">{ new CmsField("Post_Content", CmsFieldTypes.WYSIWYG).value() }</p>
+                        <div className="mb-1 text-muted">{ this.post_date }</div>
+                        <p className="card-text mb-auto">{ new CmsField("Post_Content", CmsFieldTypes.WYSIWYG).html() }</p>
                         <a href="#">Continue reading</a>
                     </div>
                     <img className="card-img-right flex-auto d-none d-md-block"

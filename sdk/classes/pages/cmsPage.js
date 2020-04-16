@@ -1,5 +1,5 @@
 import React from 'react';
-import CmsCore from "../cmsCore";
+import CmsCore from "../common/cmsCore";
 import Routing from "../../../examples/bootstrap/js/routing";
 
 export default class CmsPage extends CmsCore {
