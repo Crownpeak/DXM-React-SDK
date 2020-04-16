@@ -1,7 +1,5 @@
 import React from 'react';
-import CmsComponent from '../../../common/classes/cmsComponent';
-import CmsField from "../../../common/classes/cmsField";
-import CmsFieldTypes from "../../../common/enum/cmsFieldTypes";
+import { CmsComponent, CmsField, CmsFieldTypes } from 'crownpeak-dxm-react-sdk';
 
 export default class BlogPost extends CmsComponent
 {

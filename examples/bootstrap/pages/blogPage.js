@@ -6,8 +6,7 @@ import SecondaryPost from "../components/secondaryPost";
 import BlogPost from "../components/blogPost";
 import PostArchives from "../components/postArchives";
 import Footer from "../components/footer";
-import CmsStaticPage from "../../../common/classes/pages/cmsStaticPage";
-import CmsDynamicPage from "../../../common/classes/pages/cmsDynamicPage";
+import { CmsStaticPage, CmsDynamicPage } from 'crownpeak-dxm-react-sdk';
 
 export default class BlogPage extends CmsStaticPage
 {

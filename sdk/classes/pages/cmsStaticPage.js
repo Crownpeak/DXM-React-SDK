@@ -1,5 +1,5 @@
 import CmsPage from "./cmsPage";
-import CmsStaticDataProvider from "../../../common/classes/dataProviders/cmsStaticDataProvider";
+import CmsStaticDataProvider from "../../classes/dataProviders/cmsStaticDataProvider";
 
 export default class CmsStaticPage extends CmsPage {
     constructor(props) {

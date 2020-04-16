@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import CmsComponent from '../../../common/classes/cmsComponent';
+import { CmsComponent } from 'crownpeak-dxm-react-sdk';
 
 export default class PostArchives extends CmsComponent
 {

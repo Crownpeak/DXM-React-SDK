@@ -1,5 +1,5 @@
 import React from 'react';
-import CmsComponent from '../../../common/classes/cmsComponent';
+import { CmsComponent } from 'crownpeak-dxm-react-sdk';
 
 export default class Footer extends CmsComponent
 {
