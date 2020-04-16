@@ -1,6 +1,7 @@
 import React from 'react';
 import { CmsComponent, CmsField, CmsFieldTypes } from 'crownpeak-dxm-react-sdk';
 import Util from 'util';
+import ReactHtmlParser from 'react-html-parser';
 
 export default class BlogPost extends CmsComponent
 {
@@ -17,7 +18,7 @@ export default class BlogPost extends CmsComponent
             <div className="blog-post">
                 <h2 className="blog-post-title">{ this.post_title }</h2>
                 <p className="blog-post-meta">{ Util.format("Date: %s", this.post_date) }</p>
-                { this.post_content.html() }
+                { ReactHtmlParser(this.post_content) }
             </div>
         )
     }

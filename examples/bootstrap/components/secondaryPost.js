@@ -1,5 +1,6 @@
 import React from 'react';
 import { CmsComponent, CmsField, CmsFieldTypes } from 'crownpeak-dxm-react-sdk';
+import ReactHtmlParser from 'react-html-parser';
 
 export default class SecondaryPost extends CmsComponent
 {
@@ -19,7 +20,7 @@ export default class SecondaryPost extends CmsComponent
                             <a className="text-dark" href="#">{ this.post_title }</a>
                         </h3>
                         <div className="mb-1 text-muted">{ this.post_date }</div>
-                        <p className="card-text mb-auto">{ new CmsField("Post_Content", CmsFieldTypes.WYSIWYG).html() }</p>
+                        <p className="card-text mb-auto">{ ReactHtmlParser(new CmsField("Post_Content", CmsFieldTypes.WYSIWYG)) }</p>
                         <a href="#">Continue reading</a>
                     </div>
                     <img className="card-img-right flex-auto d-none d-md-block"
