@@ -7,8 +7,9 @@
   "author": "Crownpeak Technology, inc.",
   "license": "MIT",
   "dependencies": {
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4",
-    "react-html-parser": "^2.0.2"
+    "@babel/parser": "^7.9.4",
+    "crownpeaknodeapi": "^1.0.2",
+    "dotenv": "^8.2.0",
+    "react": "^15.5.4"
   }
 }
