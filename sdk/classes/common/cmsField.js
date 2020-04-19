@@ -8,8 +8,13 @@ export default class CmsField extends String
 
     [Symbol.toPrimitive](hint)
     {
-        if(window.cmsDataCache.cmsComponentName && window.cmsDataCache[window.cmsDataCache.cmsAssetId][window.cmsDataCache.cmsComponentName])
+        if(window.cmsDataCache.cmsComponentName && window.cmsDataCache[window.cmsDataCache.cmsAssetId][window.cmsDataCache.cmsComponentName]) {
+            if (Array.isArray(window.cmsDataCache.cmsComponentName && window.cmsDataCache[window.cmsDataCache.cmsAssetId][window.cmsDataCache.cmsComponentName])) {
+                var index = window.cmsDataCache[window.cmsDataCache.cmsAssetId][window.cmsDataCache.cmsComponentName + "-index"];
+                return window.cmsDataCache[window.cmsDataCache.cmsAssetId][window.cmsDataCache.cmsComponentName][index][this.cmsFieldName];
+            }
             return window.cmsDataCache[window.cmsDataCache.cmsAssetId][window.cmsDataCache.cmsComponentName][this.cmsFieldName];
+        }
         return this.cmsFieldName;
     }
 }
