@@ -19,7 +19,7 @@ export default class SecondaryPost extends CmsComponent
                         <h3 className="mb-0">
                             <a className="text-dark" href="#">{ this.post_title }</a>
                         </h3>
-                        <div className="mb-1 text-muted">{ this.post_date }</div>
+                        <div className="mb-1 text-muted">{ new Date(this.post_date).toLocaleDateString() }</div>
                         <p className="card-text mb-auto">{ ReactHtmlParser(new CmsField("Post_Content", CmsFieldTypes.WYSIWYG)) }</p>
                         <a href="#">Continue reading</a>
                     </div>
