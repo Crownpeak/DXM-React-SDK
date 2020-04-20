@@ -1,4 +1,0 @@
-# Removes Crownpeak DXM content generation
-./routes.json
-./content/json/*
-./content/images/*

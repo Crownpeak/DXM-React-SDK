@@ -178,3 +178,6 @@ fabric.properties
 
 # Removes Crownpeak DXM static content generation
 examples/bootstrap/content/*.json
+examples/bootstrap/routes.json
+/examples/bootstrap/content/images/
+/examples/bootstrap/content/json/
