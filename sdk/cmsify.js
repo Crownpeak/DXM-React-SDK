@@ -8,9 +8,6 @@ const main = () => {
     if (fs.existsSync(cwd + "/.env")) {
         Object.assign(config, dotenv.parse(fs.readFileSync(cwd + "/.env")))
     }
-    if (fs.existsSync(cwd + "/.env.local")) {
-        Object.assign(config, dotenv.parse(fs.readFileSync(cwd + "/.env.local")))
-    }
 
     // Check we have everything we need to work
     if (!validateInput(config)) return;
