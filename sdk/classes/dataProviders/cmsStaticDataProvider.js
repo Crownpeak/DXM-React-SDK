@@ -1,17 +1,27 @@
 export default class CmsStaticDataProvider
 {
-    static getData(assetId)
+    static _getData(filename)
     {
         const request = new XMLHttpRequest(); //TODO: Replace with synchronous implementation of fetch, as XMLHttpRequest is deprecated.
-        request.open('GET', window.cmsDataCache.cmsStaticDataLocation + '/'+ assetId + '.json', false);
+        request.open('GET', window.cmsDataCache.cmsStaticDataLocation + '/'+ filename, false);
         request.send(null);
 
         if (request.status === 200) {
-            const data = JSON.parse(request.responseText);
-
-            if(!window.cmsDataCache) window.cmsDataCache = {};
-            //TODO: Make robust if no data returned.
-            window.cmsDataCache[assetId] = data;
+            return JSON.parse(request.responseText);
         }
+    }
+
+    static getSingleAsset(assetId)
+    {
+        const data = this._getData(assetId + ".json");
+
+        if(!window.cmsDataCache) window.cmsDataCache = {};
+        //TODO: Make robust if no data returned.
+        window.cmsDataCache[assetId] = data;
+    }
+
+    static getCustomData(filename)
+    {
+        return this._getData(filename);
     }
 }

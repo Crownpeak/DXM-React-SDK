@@ -1,25 +1,12 @@
 import React from 'react';
-import { CmsComponent } from 'crownpeak-dxm-react-sdk';
+import { CmsComponent, CmsStaticDataProvider } from 'crownpeak-dxm-react-sdk';
 
 export default class TopicList extends CmsComponent
 {
     constructor(props)
     {
         super (props);
-        this.topics = [
-            "World",
-            "U.S.",
-            "Technology",
-            "Design",
-            "Culture",
-            "Business",
-            "Politics",
-            "Opinion",
-            "Science",
-            "Health",
-            "Style",
-            "Travel"
-        ];
+        this.topics = CmsStaticDataProvider.getCustomData("topics.json");
     }
 
     render() {

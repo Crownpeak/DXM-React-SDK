@@ -10,6 +10,8 @@ export default class BlogPost extends CmsComponent
         this.post_title = new CmsField("Post_Title", CmsFieldTypes.TEXT);
         this.post_date = new CmsField("Post_Date", CmsFieldTypes.DATE);
         this.post_content = new CmsField("Post_Content", CmsFieldTypes.WYSIWYG);
+        this.post_category = new CmsField("Post_Category", CmsFieldTypes.DOCUMENT);
+        debugger;
     }
 
     render() {
@@ -18,6 +20,7 @@ export default class BlogPost extends CmsComponent
                 <h2 className="blog-post-title">{ this.post_title }</h2>
                 <p className="blog-post-meta">Date: { new Date(this.post_date).toLocaleDateString() }</p>
                 { ReactHtmlParser(this.post_content) }
+                { /*this.post_category*/ }
             </div>
         )
     }
