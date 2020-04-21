@@ -2,6 +2,10 @@ const babelParser = require("@babel/parser");
 
 let _componentName = "";
 
+const reComponentType1 = /^\s*this.([a-z0-9_]+)\s*$/i;
+const reComponentType2 = /^\s*this\s*\[\s*(["'])([a-z0-9_]+)\s*\1\s*\]\s*$/i;
+const reComponentType3 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*CmsFieldTypes.([a-z0-9]+)\s*[)]\s*$/i;
+
 const parse = (content) => {
     const ast = babelParser.parse(content, {
         sourceType: "module",
@@ -35,7 +39,7 @@ const parse = (content) => {
 
 const finalProcessMarkup = (content) => {
     // Remove anything that has { and } but doesn't look like a component
-    const replacer = /[{]([^:{}]*?)[}]/g;
+    const replacer = /[{]([^}]*?[\s,/$()][^}]*?)[}]/g;
     while (replacer.test(content)) {
         content = content.replace(replacer, "$1");
     }
@@ -106,15 +110,20 @@ const processCmsComponentReturn = (content, component, render) => {
 };
 
 const processCmsComponentPattern = (content, component, object, replacements) => {
-    const children = object.children || object.argument.children || [];
-    for (let i = 0, len = children.length; i < len; i++) {
-        const child = children[i];
-        //console.log(`Child ${i} = ${child.type}`);
-        if (child.type === "JSXExpressionContainer") {
-            processJsxExpression(content, component, child, replacements);
+    if (!object) return;
+    //console.log(`DEBUG: ${typeof object}, ${object.type}, ${object.start}`)
+    if (object.type === "JSXExpressionContainer") {
+        processJsxExpression(content, component, object, replacements);
+    } else if (typeof object !== "string" && Array.isArray(object)) {
+        for (let i = 0, len = object.length; i < len; i++) {
+            //console.log(`DEBUG2 following ${i} of ${len}`);
+            processCmsComponentPattern(content, component, object[i], replacements);
         }
-        if (child.children) {
-            processCmsComponentPattern(content, component, child, replacements);
+    } else if (typeof object !== "string") {
+        const keys = Object.keys(object);
+        for (let key in keys) {
+            //console.log(`DEBUG2 following ${key}, ${keys[key]}, ${object[keys[key]]}`);
+            processCmsComponentPattern(content, component, object[keys[key]], replacements);
         }
     }
 };
@@ -124,11 +133,11 @@ const processJsxExpression = (content, component, object, replacements) => {
     if (result) {
         if (result.thisproperty) {
             // Find the definition of this field
-            result = findCmsFieldFromVariable(content, component, result.thisproperty);
+            result = findCmsFieldFromVariable(content, component, result.thisproperty, result.comment);
         }
         if (result.cmsfield) {
             //console.log(`Replacing ${content.slice(object.start, object.end)} with {${result.cmsfield}:${cmsFieldTypeToString(result.type)}}`);
-            replacements.push({start: object.start, end: object.end, value: `{${result.cmsfield}:${cmsFieldTypeToString(result.type)}}`});
+            replacements.push({start: object.start, end: object.end, value: `${result.comment ? "<!-- " : ""}{${result.cmsfield}:${cmsFieldTypeToString(result.type)}}${result.comment ? " -->" : ""}`});
         } else {
             // Trim first and last character to remove { and }
             replacements.push({start: object.start, end: object.end, value: content.slice(object.start + 1, object.end - 1)});
@@ -141,7 +150,7 @@ const processJsxExpressionSub = (content, component, object) => {
         && object.object && object.object.type === "ThisExpression"
         && object.property && object.property.type === "Identifier") {
         // Items of the form
-        // { this.field_name.value() }
+        // { this.field_name }
         // TODO: fields of the form: this["field_name"]
         //console.log(`Found this.${object.property.name}`);
         return { thisproperty: object.property.name };
@@ -159,6 +168,35 @@ const processJsxExpressionSub = (content, component, object) => {
         // TODO: fields using subcomponents
         //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].property.name}`);
         return { cmsfield: object.arguments[0].value, type: object.arguments[1].property.name };
+    }
+    else if (object.type === "JSXEmptyExpression"
+        && object.innerComments && object.innerComments.length > 0
+        && object.innerComments[0].type === "CommentBlock"
+        && (reComponentType1.test(object.innerComments[0].value)
+            || reComponentType2.test(object.innerComments[0].value)
+            || reComponentType3.test(object.innerComments[0].value))
+        ) {
+        let match = reComponentType1.exec(object.innerComments[0].value);
+        if (match) {
+            // Items of the form
+            // { /*this.field_name*/ }
+            //console.log(`Found /* this.${match[1]} */`);
+            return { thisproperty: match[1], comment: true };
+        }
+        match = reComponentType2.exec(object.innerComments[0].value);
+        if (match) {
+            // Items of the form
+            // { /*this["field_name"]*/ }
+            //console.log(`Found /* this["${match[2]"} */`);
+            return { thisproperty: match[2], comment: true };
+        }
+        match = reComponentType3.exec(object.innerComments[0].value);
+        if (match) {
+            // Items of the form
+            // { /*new CmsField("field_name", CmsFieldTypes.FieldType)*/ }
+            //console.log(`Found commented field ${match[2]} type ${match[3]}`);
+            return { cmsfield: match[2], type: match[3], comment: true };
+        }
     }
     // TODO: more complex expressions
     
@@ -180,7 +218,7 @@ const processJsxExpressionSub = (content, component, object) => {
     return null;
 };
 
-const findCmsFieldFromVariable = (content, component, variable) => {
+const findCmsFieldFromVariable = (content, component, variable, comment) => {
     let result = findCmsFieldFromVariableSub(content, component, variable);
     if (!result || !result.cmsfield) {
         // Fall back to text
@@ -190,6 +228,7 @@ const findCmsFieldFromVariable = (content, component, variable) => {
         console.warn(`COMPONENT: ${_componentName} - No definition found for ${variable}, removing { and }`);
         result = {};
     }
+    if (comment) result.comment = true;
     return result;
 };
 
@@ -229,6 +268,7 @@ const findCmsFieldFromVariableSub = (content, object, variable) => {
 
 
 const cmsFieldTypeToString = (cmsFieldType) => {
+    if (cmsFieldType === "IMAGE") return "Src";
     // TODO: robusify this!
     return cmsFieldType[0] + cmsFieldType.substr(1).toLowerCase();
 };

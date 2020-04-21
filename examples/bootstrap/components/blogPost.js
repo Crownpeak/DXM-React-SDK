@@ -11,7 +11,6 @@ export default class BlogPost extends CmsComponent
         this.post_date = new CmsField("Post_Date", CmsFieldTypes.DATE);
         this.post_content = new CmsField("Post_Content", CmsFieldTypes.WYSIWYG);
         this.post_category = new CmsField("Post_Category", CmsFieldTypes.DOCUMENT);
-        debugger;
     }
 
     render() {
