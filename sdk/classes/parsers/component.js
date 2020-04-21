@@ -18,16 +18,23 @@ const parse = (content) => {
     }
 
     let results = [];
+    let imports = [];
     const bodyParts = ast.program.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
-        if (part.type === "ExportDefaultDeclaration") {
+        if (part.type === "ImportDeclaration"
+            && part.specifiers && part.specifiers.length > 0 && part.specifiers[0].type === "ImportDefaultSpecifier"
+            && part.specifiers[0].local && part.specifiers[0].local.type === "Identifier") {
+            //console.log(`Found import ${part.specifiers[0].local.name}`);
+            imports.push(part.specifiers[0].local.name);
+        }
+        else if (part.type === "ExportDefaultDeclaration") {
             if (part.declaration.type === "ClassDeclaration"
                 && part.declaration.superClass
                 && part.declaration.superClass.name === "CmsComponent") {
                 //console.log(`Found class ${part.declaration.id.name} extending CmsComponent`);
                 const name = part.declaration.id.name;
-                const result = processCmsComponent(content, ast, part.declaration);
+                const result = processCmsComponent(content, ast, part.declaration, imports);
                 if (result) {
                     results.push({name: name, content: finalProcessMarkup(result)});
                 }
@@ -71,19 +78,19 @@ const trimSharedLeadingWhitespace = (content) => {
     return content;
 };
 
-const processCmsComponent = (content, ast, declaration) => {
+const processCmsComponent = (content, ast, declaration, imports) => {
     _componentName = declaration.id.name;
     //console.log(`Processing CmsComponent ${declaration.id.name}`);
     const bodyParts = declaration.body.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
         if (part.type === "ClassMethod" && part.key.name === "render") {
-            return processCmsComponentReturn(content, declaration, part);
+            return processCmsComponentReturn(content, declaration, part, imports);
         }
     }
 };
 
-const processCmsComponentReturn = (content, component, render) => {
+const processCmsComponentReturn = (content, component, render, imports) => {
     const parts = render.body.body;
     for (let i = 0, len = parts.length; i < len; i++) {
         const part = parts[i];
@@ -91,7 +98,7 @@ const processCmsComponentReturn = (content, component, render) => {
             && part.argument.type === "JSXElement") {
             //console.log(`Found JSX pattern ${content.slice(part.argument.start, part.argument.end)}`);
             let replacements = [];
-            processCmsComponentPattern(content, component, part, replacements);
+            processCmsComponentPattern(content, component, part, replacements, imports);
 
             // Replace the items in the pattern
             // Go from last to first, so we don't change the index numbers
@@ -109,27 +116,27 @@ const processCmsComponentReturn = (content, component, render) => {
     }
 };
 
-const processCmsComponentPattern = (content, component, object, replacements) => {
+const processCmsComponentPattern = (content, component, object, replacements, imports) => {
     if (!object) return;
-    //console.log(`DEBUG: ${typeof object}, ${object.type}, ${object.start}`)
     if (object.type === "JSXExpressionContainer") {
-        processJsxExpression(content, component, object, replacements);
+        processJsxExpression(content, component, object, replacements, imports);
+    } else if (object.type === "JSXElement" && object.openingElement && object.openingElement.name
+        && imports.find(i => object.openingElement.name.name === i)) {
+        processJsxElement(content, component, object, replacements, imports);
     } else if (typeof object !== "string" && Array.isArray(object)) {
         for (let i = 0, len = object.length; i < len; i++) {
-            //console.log(`DEBUG2 following ${i} of ${len}`);
-            processCmsComponentPattern(content, component, object[i], replacements);
+            processCmsComponentPattern(content, component, object[i], replacements, imports);
         }
     } else if (typeof object !== "string") {
         const keys = Object.keys(object);
         for (let key in keys) {
-            //console.log(`DEBUG2 following ${key}, ${keys[key]}, ${object[keys[key]]}`);
-            processCmsComponentPattern(content, component, object[keys[key]], replacements);
+            processCmsComponentPattern(content, component, object[keys[key]], replacements, imports);
         }
     }
 };
 
-const processJsxExpression = (content, component, object, replacements) => {
-    let result = processJsxExpressionSub(content, component, object);
+const processJsxExpression = (content, component, object, replacements, imports) => {
+    let result = processJsxExpressionSub(content, component, object, imports);
     if (result) {
         if (result.thisproperty) {
             // Find the definition of this field
@@ -145,7 +152,7 @@ const processJsxExpression = (content, component, object, replacements) => {
     }
 };
 
-const processJsxExpressionSub = (content, component, object) => {
+const processJsxExpressionSub = (content, component, object, imports) => {
     if (object.type === "MemberExpression"
         && object.object && object.object.type === "ThisExpression"
         && object.property && object.property.type === "Identifier") {
@@ -216,6 +223,16 @@ const processJsxExpressionSub = (content, component, object) => {
         }
     }
     return null;
+};
+
+const processJsxElement = (content, component, object, replacements, imports) => {
+    if (!object || !object.openingElement || !object.openingElement.name
+        || !imports.find(i => object.openingElement.name.name === i)) return;
+    const componentName = object.openingElement.name.name;
+    let suffix = "";
+    let previouslyUsed = replacements.filter(r => r.component === componentName);
+    if (previouslyUsed && previouslyUsed.length > 0) suffix = `_${previouslyUsed.length + 1}`;
+    replacements.push({start: object.start, end: object.end, component: componentName, value: `{${componentName}${suffix}:${componentName}}`});
 };
 
 const findCmsFieldFromVariable = (content, component, variable, comment) => {
