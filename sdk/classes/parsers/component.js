@@ -22,11 +22,15 @@ const parse = (content) => {
     const bodyParts = ast.program.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
-        if (part.type === "ImportDeclaration"
-            && part.specifiers && part.specifiers.length > 0 && part.specifiers[0].type === "ImportDefaultSpecifier"
-            && part.specifiers[0].local && part.specifiers[0].local.type === "Identifier") {
-            //console.log(`Found import ${part.specifiers[0].local.name}`);
-            imports.push(part.specifiers[0].local.name);
+        if (part.type === "ImportDeclaration" && part.specifiers && part.specifiers.length > 0) {
+            for (let i in part.specifiers) {
+                const specifier = part.specifiers[i];
+                if ((specifier.type === "ImportDefaultSpecifier" || specifier.type === "ImportSpecifier")
+                    && specifier.local && specifier.local.type === "Identifier") {
+                    //console.log(`Found import ${specifier.local.name}`);
+                    imports.push(specifier.local.name);
+                }
+            }
         }
         else if (part.type === "ExportDefaultDeclaration") {
             if (part.declaration.type === "ClassDeclaration"
