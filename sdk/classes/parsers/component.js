@@ -32,7 +32,7 @@ const parse = (content) => {
                 }
             }
         }
-        else if (part.type === "ExportDefaultDeclaration") {
+        else if (part.type === "ExportDefaultDeclaration" || part.type === "ExportNamedDeclaration") {
             if (part.declaration.type === "ClassDeclaration"
                 && part.declaration.superClass
                 && part.declaration.superClass.name === "CmsComponent") {

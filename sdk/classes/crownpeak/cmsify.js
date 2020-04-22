@@ -12,11 +12,11 @@ const main = () => {
     // Check we have everything we need to work
     if (!validateInput(config)) return;
 
-    const cms = require("./classes/cms");
+    const cms = require("./cms");
     cms.init(config);
 
-    const parser = require("./classes/parsers/parser");
-    const files = require("./classes/files");
+    const parser = require("../parsers/parser");
+    const files = require("../utils/files");
 
     let components = [], pages = [], wrappers = [], uploads = [];
     const htmlfiles = files.getRecursive(process.env.INIT_CWD, "html");
