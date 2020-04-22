@@ -45,10 +45,12 @@ yarn add react-html-parser
 ## Usage - Runtime Data Libraries
  Review example project at <a href="https://github.com/Crownpeak/DXM-React-SDK/tree/master/examples/bootstrap" target="_blank">https://github.com/Crownpeak/DXM-React-SDK/tree/master/examples/bootstrap</a>
  for complete usage options. The example project includes the following capabilities:
-  * Routing using ```react-router``` and JSON payload, delivered from DXM to map AssetId to requested path;
+  * Routing using ```react-router``` and JSON payload, delivered from DXM to map AssetId to requested path. Although
+  not part of the SDK itself, the example can be used if desired. For routes.json structure, see example at the foot of this README.
   * ```CmsStaticPage``` type to load payload data from JSON file on filesystem, delivered by DXM;
   * ```CmsDynamicPage``` type to load payload data from DXM Dynamic Content API.
- 
+
+
 ### CmsStaticPage Type
 Loads payload data from JSON file on filesystem - expects knowledge of DXM AssetId in order to find file with corresponding
 name (e.g., 12345.json). CmsStaticPage is the data equivalent of a DXM Asset when used as a page. Example at /examples/bootstrap/pages/blogPage.js:
@@ -126,13 +128,13 @@ export default class BlogPost extends CmsComponent
 ### CmsFieldType
 Enumeration containing field types supported within the SDK.
 
-| CmsFieldType  | DXM Mapping   |
-| ------------- |---------------|
-| TEXT          | Text          |
-| WYSIWYG       | Wysiwyg       |
-| DATE          | DateTime      |
-| DOCUMENT      | Document      |
-| IMAGE         | Image         |
+| CmsFieldType  | DXM Mapping     |
+| ------------- | --------------- |
+| TEXT          | Text            |
+| WYSIWYG       | Wysiwyg         |
+| DATE          | DateTime        |
+| DOCUMENT      | Document        |
+| IMAGE         | Image           |
 
 
 ### Querying Custom Data from Dynamic Content API
@@ -192,4 +194,77 @@ export default class TopicList extends CmsComponent
         )
     }
 }
+```
+
+## Usage - DXM Content-Type Scaffolding (cmsify)
+Requires .env file located in root of the React project to be scaffolded. Values required within .env file are:
+ 
+| Key           | Description                                                               |
+| ------------- | ------------------------------------------------------------------------- |
+| CMS_INSTANCE  | DXM Instance Name.                                                        |
+| CMS_USERNAME  | DXM Username with access to create Assets, Models, Templates, etc.        |
+| CMS_PASSWORD  | Pretty obvious.                                                           |
+| CMS_API_KEY   | DXM Developer API Key - Can be obtained by contacting Crownpeak Support.  |
+| CMS_SITE_ROOT | DXM Site Root Asset Id                                                    |
+| CMS_PROJECT   | DXM Project Asset Id                                                      |
+| CMS_WORKFLOW  | DXM Workflow Id (to be applied to created Models)                         |
+
+From the root of the project to be React scaffolded:
+
+```
+$ yarn crownpeak
+yarn run v1.22.0
+$ ../../sdk/cmsify
+COMPONENT: Header - No definition found for props, removing { and }
+COMPONENT: PostArchives - No definition found for months, removing { and }
+COMPONENT: TopicList - No definition found for topics, removing { and }
+Uploaded [holder.min.js] as [/Skunks Works/React SDK/_Assets/js/holder.min.js] (261402)
+Unable to find source file [/Users/paul.taylor/Documents/Repos/Crownpeak/DXM-React-SDK/examples/bootstrap/js/bundle.js] for upload
+Uploaded [blog.css] as [/Skunks Works/React SDK/_Assets/css/blog.css] (261400)
+Saved wrapper [Blog] as [/Skunks Works/React SDK/Component Project/Component Library/Nav Wrapper Definitions/Blog Wrapper] (261771)
+Saved component [BlogPost] as [/Skunks Works/React SDK/Component Project/Component Library/Component Definitions/Blog Post] (261776)
+Saved component [FeaturedPost] as [/Skunks Works/React SDK/Component Project/Component Library/Component Definitions/Featured Post] (261777)
+Saved component [Footer] as [/Skunks Works/React SDK/Component Project/Component Library/Component Definitions/Footer] (261778)
+Saved component [Header] as [/Skunks Works/React SDK/Component Project/Component Library/Component Definitions/Header] (261779)
+Saved component [PostArchives] as [/Skunks Works/React SDK/Component Project/Component Library/Component Definitions/Post Archives] (261780)
+Saved component [SecondaryPost] as [/Skunks Works/React SDK/Component Project/Component Library/Component Definitions/Secondary Post] (261781)
+Saved component [TopicList] as [/Skunks Works/React SDK/Component Project/Component Library/Component Definitions/Topic List] (261782)
+Saved template [BlogPage] as [/Skunks Works/React SDK/Component Project/Component Library/Template Definitions/Blog Page Template] (261370)
+Saved model [BlogPage] as [/Skunks Works/React SDK/Component Project/Models/Blog Page Folder/Blog Page] (261784)
+Saved content folder [Blog Pages] as [/Skunks Works/React SDK/Blog Pages/] (261376)
+✨  Done in 62.61s.
+```
+
+cmsify can be run multiple times as additional capabilities are added to the React project. Asset data within DXM will not
+be destroyed by future runs.
+
+## routes.json File Structure Example
+```
+[
+  {
+    "path": "/",
+    "exact": true,
+    "component": "BlogPage",
+    "cmsassetid": "261377"
+  },
+  {
+    "path": "/posts/months/:month",
+    "component": "BlogPage",
+    "cmsassetid": "23456"
+  }
+]
+```
+
+## .env File Structure Example
+```
+# Crownpeak DXM Configuration
+CMS_INSTANCE={Replace with CMS Instnace Name}
+CMS_USERNAME={Replace with CMS Username}
+CMS_PASSWORD={Replace with CMS Password}
+CMS_API_KEY={Replace with CMS Developer API Key}
+CMS_SITE_ROOT={Replace with Asset Id of Site Root}
+CMS_PROJECT={Replace with Asset Id of Project}
+CMS_WORKFLOW={Replace with Workflow Id}
+CMS_STATIC_CONTENT_LOCATION=/content/json
+CMS_DYNAMIC_CONTENT_LOCATION=//searchg2.crownpeak.net/{Replace with Search G2 Collection Name}/select/?wt=json
 ```
