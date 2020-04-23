@@ -8,8 +8,6 @@ export default class CmsDynamicDataProvider
 
         if (request.status === 200) {
             return JSON.parse(request.responseText);
-
-
         }
     }
 
@@ -18,8 +16,9 @@ export default class CmsDynamicDataProvider
         const data = this._getData("&fl=id,custom_t_json:%5Bjson%5D&q=" + assetId);
 
         if(!window.cmsDataCache) window.cmsDataCache = {};
-        //TODO: Make robust if no data returned.
-        window.cmsDataCache[assetId] = data.response.docs[0].custom_t_json;
+        window.cmsDataCache[assetId] = data && data.response && data.response.docs && data.response.docs.length > 0
+            ? data.response.docs[0].custom_t_json
+            : {};
     }
 
     static getDynamicQuery(query)

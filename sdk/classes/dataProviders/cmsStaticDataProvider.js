@@ -16,8 +16,7 @@ export default class CmsStaticDataProvider
         const data = this._getData(assetId + ".json");
 
         if(!window.cmsDataCache) window.cmsDataCache = {};
-        //TODO: Make robust if no data returned.
-        window.cmsDataCache[assetId] = data;
+        window.cmsDataCache[assetId] = data || {};
     }
 
     static getCustomData(filename)
