@@ -162,9 +162,16 @@ const processJsxExpressionSub = (content, component, object, imports) => {
         && object.property && object.property.type === "Identifier") {
         // Items of the form
         // { this.field_name }
-        // TODO: fields of the form: this["field_name"]
         //console.log(`Found this.${object.property.name}`);
         return { thisproperty: object.property.name };
+    }
+    else if (object.type === "MemberExpression"
+        && object.object && object.object.type === "ThisExpression"
+        && object.property && object.property.type === "StringLiteral") {
+        // Items of the form
+        // { this["field_name"] }
+        //console.log(`Found this.${object.property.value}`);
+        return { thisproperty: object.property.value };
     }
     else if (object.type === "NewExpression"
         && object.callee && object.callee.type == "Identifier" && object.callee.name === "CmsField"
@@ -175,8 +182,6 @@ const processJsxExpressionSub = (content, component, object, imports) => {
         && object.arguments[1].property) {
         // Items of the form
         // { new CmsField("field_name", CmsFieldTypes.FieldType) }
-        // TODO: fields constructed without using literals
-        // TODO: fields using subcomponents
         //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].property.name}`);
         return { cmsfield: object.arguments[0].value, type: object.arguments[1].property.name };
     }
