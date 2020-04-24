@@ -158,7 +158,7 @@ const createOrUpdateContentFolder = async (shortName) => {
         let model = await getByPath(`${modelsFolder.fullPath}${folderName}`);
         if (!model || !model.asset) throw `Unable to find model folder [${folderName}]`;
 
-        console.log(`DEBUG: creating with model ${model.asset.id}`);
+        //console.log(`DEBUG: creating with model ${model.asset.id}`);
         folder = await createFolder(name, _config.CMS_SITE_ROOT, model.asset.id);
         if (!folder || !folder.asset) throw `Unable to create folder [${folderName}]`;
     }
@@ -220,6 +220,9 @@ const processTemplates = async (templates, wrapperName) => {
         template.assetPath = await getPath(template.assetId);
         console.log(`Saved template [${template.name}] as [${template.assetPath}] (${template.assetId})`);
         result = await createOrUpdateModel(template.name);
+        if (!result.fullPath) {
+            result.fullPath = await getPath(result.id);
+        }
         console.log(`Saved model [${template.name}] as [${result.fullPath}] (${result.id})`);
         result = await createOrUpdateContentFolder(template.name);
         let assetPath = await getPath(result.id);
