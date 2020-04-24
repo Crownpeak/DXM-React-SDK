@@ -205,9 +205,10 @@ Requires .env file located in root of the React project to be scaffolded. Values
 | CMS_USERNAME  | DXM Username with access to create Assets, Models, Templates, etc.        |
 | CMS_PASSWORD  | Pretty obvious.                                                           |
 | CMS_API_KEY   | DXM Developer API Key - Can be obtained by contacting Crownpeak Support.  |
-| CMS_SITE_ROOT | DXM Site Root Asset Id                                                    |
-| CMS_PROJECT   | DXM Project Asset Id                                                      |
-| CMS_WORKFLOW  | DXM Workflow Id (to be applied to created Models)                         |
+| CMS_SITE_ROOT | DXM Site Root Asset Id.                                                   |
+| CMS_PROJECT   | DXM Project Asset Id.                                                     |
+| CMS_WORKFLOW  | DXM Workflow Id (to be applied to created Models).                        |
+| CMS_SERVER    | (Optional) Allows base Crownpeak DXM URL to be overridden.                |
 
 From the root of the project to be React scaffolded:
 
@@ -258,7 +259,7 @@ be destroyed by future runs.
 ## .env File Structure Example
 ```
 # Crownpeak DXM Configuration
-CMS_INSTANCE={Replace with CMS Instnace Name}
+CMS_INSTANCE={Replace with CMS Instance Name}
 CMS_USERNAME={Replace with CMS Username}
 CMS_PASSWORD={Replace with CMS Password}
 CMS_API_KEY={Replace with CMS Developer API Key}
