@@ -7,9 +7,16 @@ import BlogPost from "../components/blogPost";
 import PostArchives from "../components/postArchives";
 import Footer from "../components/footer";
 import { CmsStaticPage, CmsDynamicPage } from 'crownpeak-dxm-react-sdk';
+import Routing from "../js/routing";
 
 export default class BlogPage extends CmsStaticPage
 {
+    constructor(props)
+    {
+        super(props);
+        if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
+    }
+
     render() {
         super.render();
         return (

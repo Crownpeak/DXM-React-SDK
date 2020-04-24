@@ -11,6 +11,7 @@
     "crownpeak": "../../sdk/cmsify"
   },
   "dependencies": {
+    "crownpeak-dxm-react-sdk": "^1.0.2",
     "history": "^4.10.1",
     "json-loader": "^0.5.7",
     "react": "^15.5.4",
