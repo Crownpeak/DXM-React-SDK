@@ -34,7 +34,7 @@ Data Sources**
    Process, again via the CMS Access API and existing "post_save" process; and
     * Creates a new Model for the React Page Content-Type, via the CMS Access API, so that authors can create multiple versions
    of a structured Page or Component, without needing to run an entire development/test cycle.
-   
+
 ## Install
  ```
 npm install react-html-parser
@@ -277,3 +277,7 @@ CMS_WORKFLOW={Replace with Workflow Id}
 CMS_STATIC_CONTENT_LOCATION=/content/json
 CMS_DYNAMIC_CONTENT_LOCATION=//searchg2.crownpeak.net/{Replace with Search G2 Collection Name}/select/?wt=json
 ```
+
+## Videos & Tutorials
+Walk through of creating /examples/bootstrap-homepage from scratch, starting with an empty folder.
+<a href="https://view.vzaar.com/21495120/player" target="_blank">![Crownpeak DXM SDK for React Video](./images/crownpeak-dxm-sdk-for-react-title-frame.png?raw=true "Crownpeak DXM SDK for React Video")</a>
