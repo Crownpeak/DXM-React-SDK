@@ -1,6 +1,8 @@
 const dotenv = require("dotenv");
 const fs = require("fs");
 
+const _args = process.argv.slice(2);
+
 const main = () => {
     const cwd = process.env.INIT_CWD;
     let config = process.env;
@@ -45,6 +47,7 @@ const main = () => {
             pages = pages.concat(result.pages);
         }
     }
+    components = reorderComponents(components);
 
     // console.log(`Components: ${components.map(c => c.name)}`);
     // console.log(`Pages: ${pages.map(p => p.name)}`);
@@ -57,6 +60,40 @@ const main = () => {
     .then(() => cms.saveComponents(components)) //.then((result) => console.log(JSON.stringify(result))))
     .then(() => cms.saveTemplates(pages, wrappers.length > 0 ? wrappers[0].name : "")) //.then((result) => console.log(JSON.stringify(result))))
     ;
+};
+
+const reorderComponents = (components) => {
+    let workingSet = components.filter(c => c.dependencies && c.dependencies.length);
+    if (!workingSet.length) return components;
+
+    // Start with components with no dependencies
+    let result = components.filter(c => !c.dependencies || !c.dependencies.length);
+
+    while (true) {
+        let processedResult = processSimpleDependencies(result, workingSet);
+        if (processedResult.length === result.length) {
+            // Nothing changed - exit loop
+            break;
+        } else {
+            workingSet = components.filter(r => processedResult.findIndex(p => p.name === r.name) < 0);
+            result = processedResult;
+        }
+    }
+    if (!workingSet.length) return result;
+
+    if (_args.findIndex(a => a.toLowerCase() === "--ignorecirculardependencies") > -1) {
+        console.warn(`CMSIFY: Warning: circular dependencies found and ignored.`);
+        return result.concat(workingSet);
+    }
+
+    console.error(`CMSIFY: Error: circular dependencies found. Please resolve these before importing, or set the --ignoreCircularDependencies argument.`);
+    process.exit(1);
+};
+
+const processSimpleDependencies = (processedComponents, components) => {
+    // Anything that depends entirely on components that are already processed can be allowed
+    let simpleDependencies = components.filter(c => c.dependencies.every(d => processedComponents.findIndex(r => r.name === d) > -1));
+    return processedComponents.concat(simpleDependencies);
 };
 
 const validateInput = (config) => {

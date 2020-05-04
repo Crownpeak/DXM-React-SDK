@@ -19,6 +19,7 @@ const parse = (content) => {
 
     let results = [];
     let imports = [];
+    let dependencies = [];
     const bodyParts = ast.program.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
@@ -38,9 +39,9 @@ const parse = (content) => {
                 && part.declaration.superClass.name === "CmsComponent") {
                 //console.log(`Found class ${part.declaration.id.name} extending CmsComponent`);
                 const name = part.declaration.id.name;
-                const result = processCmsComponent(content, ast, part.declaration, imports);
+                const result = processCmsComponent(content, ast, part.declaration, imports, dependencies);
                 if (result) {
-                    results.push({name: name, content: finalProcessMarkup(result)});
+                    results.push({name: name, content: finalProcessMarkup(result), dependencies: dependencies});
                 }
             }
         }
@@ -82,19 +83,19 @@ const trimSharedLeadingWhitespace = (content) => {
     return content;
 };
 
-const processCmsComponent = (content, ast, declaration, imports) => {
+const processCmsComponent = (content, ast, declaration, imports, dependencies) => {
     _componentName = declaration.id.name;
     //console.log(`Processing CmsComponent ${declaration.id.name}`);
     const bodyParts = declaration.body.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
         if (part.type === "ClassMethod" && part.key.name === "render") {
-            return processCmsComponentReturn(content, declaration, part, imports);
+            return processCmsComponentReturn(content, declaration, part, imports, dependencies);
         }
     }
 };
 
-const processCmsComponentReturn = (content, component, render, imports) => {
+const processCmsComponentReturn = (content, component, render, imports, dependencies) => {
     const parts = render.body.body;
     for (let i = 0, len = parts.length; i < len; i++) {
         const part = parts[i];
@@ -102,7 +103,7 @@ const processCmsComponentReturn = (content, component, render, imports) => {
             && part.argument.type === "JSXElement") {
             //console.log(`Found JSX pattern ${content.slice(part.argument.start, part.argument.end)}`);
             let replacements = [];
-            processCmsComponentPattern(content, component, part, replacements, imports);
+            processCmsComponentPattern(content, component, part, replacements, imports, dependencies);
 
             // Replace the items in the pattern
             // Go from last to first, so we don't change the index numbers
@@ -120,21 +121,21 @@ const processCmsComponentReturn = (content, component, render, imports) => {
     }
 };
 
-const processCmsComponentPattern = (content, component, object, replacements, imports) => {
+const processCmsComponentPattern = (content, component, object, replacements, imports, dependencies) => {
     if (!object) return;
     if (object.type === "JSXExpressionContainer") {
         processJsxExpression(content, component, object, replacements, imports);
     } else if (object.type === "JSXElement" && object.openingElement && object.openingElement.name
         && imports.find(i => object.openingElement.name.name === i)) {
-        processJsxElement(content, component, object, replacements, imports);
+        processJsxElement(content, component, object, replacements, imports, dependencies);
     } else if (typeof object !== "string" && Array.isArray(object)) {
         for (let i = 0, len = object.length; i < len; i++) {
-            processCmsComponentPattern(content, component, object[i], replacements, imports);
+            processCmsComponentPattern(content, component, object[i], replacements, imports, dependencies);
         }
     } else if (typeof object !== "string") {
         const keys = Object.keys(object);
         for (let key in keys) {
-            processCmsComponentPattern(content, component, object[keys[key]], replacements, imports);
+            processCmsComponentPattern(content, component, object[keys[key]], replacements, imports, dependencies);
         }
     }
 };
@@ -203,7 +204,7 @@ const processJsxExpressionSub = (content, component, object, imports) => {
         if (match) {
             // Items of the form
             // { /*this["field_name"]*/ }
-            //console.log(`Found /* this["${match[2]"} */`);
+            //console.log(`Found /* this[\"${match[2]}\"] */`);
             return { thisproperty: match[2], comment: true };
         }
         match = reComponentType3.exec(object.innerComments[0].value);
@@ -234,12 +235,13 @@ const processJsxExpressionSub = (content, component, object, imports) => {
     return null;
 };
 
-const processJsxElement = (content, component, object, replacements, imports) => {
+const processJsxElement = (content, component, object, replacements, imports, dependencies) => {
     if (!object || !object.openingElement || !object.openingElement.name
         || !imports.find(i => object.openingElement.name.name === i)) return;
     const componentName = object.openingElement.name.name;
     let suffix = "";
     let previouslyUsed = replacements.filter(r => r.component === componentName);
+    if (!previouslyUsed || !previouslyUsed.length) dependencies.push(componentName);
     if (previouslyUsed && previouslyUsed.length > 0) suffix = `_${previouslyUsed.length + 1}`;
     replacements.push({start: object.start, end: object.end, component: componentName, value: `{${componentName}${suffix}:${componentName}}`});
 };
