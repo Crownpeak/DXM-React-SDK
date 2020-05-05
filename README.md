@@ -197,12 +197,11 @@ export default class TopicList extends CmsComponent
 ```
 
 ## Usage - DXM Content-Type Scaffolding (cmsify)
-Requires manual update to DXM Component Library, by installing <a href="./dxm/dxm-cl-patch-for-react-sdk-2020APR24.xml" target="_blank">dxm-cl-patch-for-react-sdk-2020APR24.xml</a>
+Requires manual update to DXM Component Library, by installing <a href="./dxm/dxm-cl-patch-for-react-sdk-2020MAY05.xml" target="_blank">dxm-cl-patch-for-react-sdk-2020MAY05.xml</a>
 using Crownpeak DXM Content Xcelerator℠ (<a href="https://github.com/Crownpeak/Content-Xcelerator" target="_blank">https://github.com/Crownpeak/Content-Xcelerator</a>).
 
 Installation instructions:
  * Create new DXM Site Root and check "Install Component Project using Component Library 2.1";
- * Edit and Save Component Library Config that you will find in "{Site Root}/Component Project/Component Library/Component Library Config";
  * Use Crownpeak DXM Content Xcelerator℠ to install manifest (detailed above) to Site Root with "Overwrite Existing Assets" option checked.
 
 Requires .env file located in root of the React project to be scaffolded. Values required within .env file are:
