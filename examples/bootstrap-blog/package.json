@@ -8,10 +8,10 @@
   "license": "MIT",
   "scripts": {
     "start": "node_modules/.bin/webpack-dev-server --progress --inline --hot",
-    "crownpeak": "../../sdk/cmsify"
+    "crownpeak": "./node_modules/crownpeak-dxm-react-sdk/cmsify"
   },
   "dependencies": {
-    "crownpeak-dxm-react-sdk": "^1.0.2",
+    "crownpeak-dxm-react-sdk": "^1.0.4",
     "history": "^4.10.1",
     "json-loader": "^0.5.7",
     "react": "^15.5.4",
