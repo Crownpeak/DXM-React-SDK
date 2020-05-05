@@ -39,7 +39,15 @@ Data Sources**
    
 ## Version History
  
- | Version       | Date          | Changes                            |
- | ------------- | --------------|----------------------------------- |
- | 1.0.2         | 2020APR24     | Initial Release.                   |
- | 1.0.3         | 2020MAY05     | Adds Component dependencies.       |
+| Version       | Date          | Changes                            |
+| ------------- | --------------|----------------------------------- |
+| 1.0.2         | 2020APR24     | Initial Release.                   |
+| 1.0.3         | 2020MAY05     | Adds Component dependencies.       |
+ 
+## Credit
+Thanks to:
+* <a href="https://github.com/richard-lund" target="_blank">Richard Lund</a> for the refactoring;
+* <a href="https://github.com/ptylr" target="_blank">Paul Taylor</a> for a few edits ;)
+ 
+## License
+All yours. MIT License. Do what you will, at your own risk!
