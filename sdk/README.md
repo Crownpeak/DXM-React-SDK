@@ -36,3 +36,10 @@ Data Sources**
    Process, again via the CMS Access API and existing "post_save" process; and
     * Creates a new Model for the React Page Content-Type, via the CMS Access API, so that authors can create multiple versions
    of a structured Page or Component, without needing to run an entire development/test cycle.
+   
+## Version History
+ 
+ | Version       | Date          | Changes                            |
+ | ------------- | --------------|----------------------------------- |
+ | 1.0.2         | 2020APR24     | Initial Release.                   |
+ | 1.0.3         | 2020MAY05     | Adds Component dependencies.       |
