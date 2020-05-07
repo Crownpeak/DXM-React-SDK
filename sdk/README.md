@@ -44,3 +44,4 @@ Data Sources**
 | 1.0.2         | 2020APR24     | Initial Release.                   |
 | 1.0.3         | 2020MAY05     | Adds Component dependencies.       |
 | 1.0.4         | 2020MAY05     | Correct paths in cmsify script.    |
+| 1.0.5         | 2020MAY07     | Changed to use crownpeak-dxm-accessapi-helper.    |
