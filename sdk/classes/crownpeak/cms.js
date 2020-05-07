@@ -1,7 +1,7 @@
-const crownpeak = require("crownpeaknodeapi");
+const CrownpeakApi = require("crownpeak-dxm-accessapi-helper");
 const fs = require("fs");
 
-const _cms = new crownpeak.Api();
+const crownpeak = new CrownpeakApi();
 
 let _config = process.env;
 let _assetCache = {};
@@ -12,7 +12,7 @@ const init = (cfg) => {
 
 const login = async () => {
     //console.log(`Logging into ${_config.CMS_INSTANCE}`);
-    return _cms.login(
+    return crownpeak.login(
         _config.CMS_USERNAME,
         _config.CMS_PASSWORD,
         _config.CMS_SERVER || "cms.crownpeak.net",
@@ -22,15 +22,13 @@ const login = async () => {
 };
 
 const createFileFromModel = async (name, folderId, modelId) => {
-    const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
-    const request = new crownpeak.AccessAsset.AssetCreateRequest(name, folderId, modelId, 2, 0, 0, 0, 0);
-    return assetAccess.createAsset(request);
+    const request = new crownpeak.Asset.CreateRequest(name, folderId, modelId, 2, 0, 0, 0, 0);
+    return crownpeak.Asset.create(request);
 };
 
 const createFile = async (name, folderId, templateId, workflowId) => {
-    const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
-    const request = new crownpeak.AccessAsset.AssetCreateRequest(name, folderId, 0, 2, -1, templateId, workflowId, 0);
-    return assetAccess.createAsset(request);
+    const request = new crownpeak.Asset.CreateRequest(name, folderId, 0, 2, -1, templateId, workflowId, 0);
+    return crownpeak.Asset.create(request);
 };
 
 const createOrUpdateFile = async (name, folderId, modelId, content) => {
@@ -46,26 +44,22 @@ const createOrUpdateFile = async (name, folderId, modelId, content) => {
 
 const createFolder = async (name, folderId, modelId) => {
     if (modelId) return createFolderWithModel(name, folderId, modelId);
-    const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
-    const request = new crownpeak.AccessAsset.AssetCreateRequest(name, folderId, modelId, 4, 0, 0, 0, 0);
-    return assetAccess.createAsset(request);
+    const request = new crownpeak.Asset.CreateRequest(name, folderId, modelId, 4, 0, 0, 0, 0);
+    return crownpeak.Asset.create(request);
 };
 
 const createFolderWithModel = async (name, folderId, modelId) => {
-    const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
-    const request = new crownpeak.AccessAsset.AssetCreateFolderWithModelRequest(name, folderId, modelId);
-    return assetAccess.CreateFolderWithModel(request);
+    const request = new crownpeak.Asset.CreateFolderWithModelRequest(name, folderId, modelId);
+    return crownpeak.Asset.createFolderWithModel(request);
 };
 
 const download = async (id) => {
-    const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
-    const request = new crownpeak.AccessAsset.DownloadAssetsPrepareRequest(id);
-    return assetAccess.DownloadAssetsPrepareBuffer(request);
+    const request = new crownpeak.Asset.DownloadPrepareRequest(id);
+    return crownpeak.Asset.downloadAsBuffer(request);
 };
 
 const exists = async (idOrPath) => {
-    const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
-    return assetAccess.exists(idOrPath);
+    return crownpeak.Asset.exists(idOrPath);
 };
 
 const get = async (idOrPath, bustCache) => {
@@ -75,18 +69,16 @@ const get = async (idOrPath, bustCache) => {
 
 const getById = async (id, bustCache) => {
     if (!_assetCache[id] || bustCache === true) {
-        const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
-        _assetCache[id] = await assetAccess.read(id);
+        _assetCache[id] = await crownpeak.Asset.read(id);
     }
     return _assetCache[id];
 };
 
 const getByPath = async (path, bustCache) => {
     if (!_assetCache[path] || bustCache === true) {
-        const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
         const existsResult = await exists(path);
         if (!existsResult || !existsResult.exists) return null;
-        _assetCache[path] = await assetAccess.read(existsResult.assetId);
+        _assetCache[path] = await crownpeak.Asset.read(existsResult.assetId);
         _assetCache[existsResult.id] = _assetCache[path];
     }
     return _assetCache[path];
@@ -97,9 +89,8 @@ const getPath = async (id) => {
 };
 
 const update = async (id, content, deleteContent = []) => {
-    const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
-    const request = new crownpeak.AccessAsset.AssetUpdateRequest(id, content, deleteContent, true, true);
-    return assetAccess.update(request);
+    const request = new crownpeak.Asset.UpdateRequest(id, content, deleteContent, true, true);
+    return crownpeak.Asset.update(request);
 };
 
 const uploadBuffer = async (name, folderId, modelId, content, workflowId) => {
@@ -110,9 +101,8 @@ const uploadBuffer = async (name, folderId, modelId, content, workflowId) => {
         // We replace a binary by passing its asset id as the folder id
         folderId = result.assetId;
     }
-    const assetAccess = new crownpeak.AccessAsset.AccessAsset(_cms);
-    const request = new crownpeak.AccessAsset.AssetUploadRequest(content, folderId, modelId, name, workflowId || 0);
-    return assetAccess.upload(request);
+    const request = new crownpeak.Asset.UploadRequest(content, folderId, modelId, name, workflowId || 0);
+    return crownpeak.Asset.upload(request);
 };
 
 const uploadFile = async (name, folderId, modelId, filePath, workflowId) => {
@@ -355,8 +345,7 @@ const getWrapperDefinitionModel = async () => {
 const getWorkflowId = async () => {
     let workflow = _config.CMS_WORKFLOW || "0";
     if (parseInt(workflow) && parseInt(workflow).toString().length === workflow.length) return workflow;
-    const workflowAccess = new crownpeak.Workflow(_cms);
-    const workflows = (await workflowAccess.getList()).workflows;
+    const workflows = (await crownpeak.Workflow.getList()).workflows;
     const keys = Object.keys(workflows);
     for (let key in keys)
     {
