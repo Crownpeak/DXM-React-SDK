@@ -3,9 +3,9 @@
 
 
 "@babel/parser@^7.9.4":
-  version "7.9.4"
-  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.9.4.tgz#68a35e6b0319bbc014465be43828300113f2f2e8"
-  integrity sha512-bC49otXX6N0/VYhgOMh4gnP26E9xnDZK3TmbNpxYzzz9BQLBosQwfyOe9/cXUU3txYhTzLCbcqd5c8y/OmCjHA==
+  version "7.9.6"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.9.6.tgz#3b1bbb30dabe600cd72db58720998376ff653bc7"
+  integrity sha512-AoeIEJn8vt+d/6+PXDRPaksYhnlbMIiejioBZvvMQsOjW/JYK6k/0dKnvvP3EhK5GfMBWDPtrxRtegWdAcdq9Q==
 
 "@babel/runtime@^7.1.2", "@babel/runtime@^7.4.0":
   version "7.9.2"
@@ -1746,15 +1746,23 @@ crownpeak-dxm-accessapi-helper@^1.0.2:
     request-promise "^4.2.4"
     request-promise-native "^1.0.7"
 
-crownpeak-dxm-react-sdk@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/crownpeak-dxm-react-sdk/-/crownpeak-dxm-react-sdk-1.0.5.tgz#1554f14b793f2ac742d159bc2db10da9ac1c1216"
-  integrity sha512-eneqIGPmiSL/676F5QdLlJVUYICrDCfIrM9cJyf56GvkHFqysOroXfmUVkt8D7ZdjJ0CEp7RWZzS0a7muxQQ6A==
+crownpeak-dxm-react-sdk@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/crownpeak-dxm-react-sdk/-/crownpeak-dxm-react-sdk-1.0.7.tgz#f070f5ff574171a46d0ac2c66f6481879a5dee83"
+  integrity sha512-jmUwimV3BDZUavOd+xfnjRQ5W169/rH3nnviInOl1EXmoa9JvOniRDPBeX+9HewUl4TsDzk5ggi2eXv47is7bA==
   dependencies:
     "@babel/parser" "^7.9.4"
     crownpeak-dxm-accessapi-helper "^1.0.2"
+    crownpeak-dxm-sdk-core "^0.1.1"
     dotenv "^8.2.0"
     react "^15.5.4"
+
+crownpeak-dxm-sdk-core@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/crownpeak-dxm-sdk-core/-/crownpeak-dxm-sdk-core-0.1.1.tgz#80160fd3e85859be37b09c29d3cbf0e5932987c5"
+  integrity sha512-kfkkz0XpUNlrRM+oQWRNdv4Pt2/0cMg1QPFOssv+qJ9lRE2hkeqobKs8KIQKZdIUbobbCfmDcvQvPfztDuEA1g==
+  dependencies:
+    crownpeak-dxm-accessapi-helper "^1.0.2"
 
 crypto-browserify@^3.11.0:
   version "3.12.0"
@@ -2112,9 +2120,9 @@ entities@^2.0.0:
   integrity sha512-D9f7V0JSRwIxlRI2mjMqufDrRDnx8p+eEOz7aUM9SuvF8gsBzra0/6tbjl1m8eQHrZlYj6PxqE00hZ1SAIKPLw==
 
 errlop@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/errlop/-/errlop-2.1.0.tgz#a9df1d2e5b1359e95c3fc0bf3f1b68fa39017260"
-  integrity sha512-sEmQX03aJkWsqTPDYaymq3ROJmKxMHhFS4UN8fWwr5ZiRtw3p61QHRk2QQj68DiaTIXWujJP+uEUS1Zx3spxlw==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/errlop/-/errlop-2.2.0.tgz#1ff383f8f917ae328bebb802d6ca69666a42d21b"
+  integrity sha512-e64Qj9+4aZzjzzFpZC7p5kmm/ccCrbLhAJplhsDXQFs87XTsXwOpH4s1Io2s90Tau/8r2j9f4l/thhDevRjzxw==
 
 errno@^0.1.3, errno@~0.1.7:
   version "0.1.7"
