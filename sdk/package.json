@@ -1,6 +1,6 @@
 {
   "name": "crownpeak-dxm-react-sdk",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Crownpeak Digital Experience Management (DXM)Software Development Kit (SDK) for React has been constructed to assist the Single Page App developer in developing client-side applications that leverage DXM for content management purposes.",
   "repository": "https://github.com/Crownpeak/DXM-React-SDK",
   "main": "entry.js",
@@ -9,6 +9,7 @@
   "dependencies": {
     "@babel/parser": "^7.9.4",
     "crownpeak-dxm-accessapi-helper": "^1.0.2",
+    "crownpeak-dxm-sdk-core": "^0.1.1",
     "dotenv": "^8.2.0",
     "react": "^15.5.4"
   }

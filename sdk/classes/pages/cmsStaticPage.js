@@ -1,5 +1,5 @@
 import CmsPage from "./cmsPage";
-import CmsStaticDataProvider from "../../classes/dataProviders/cmsStaticDataProvider";
+import { CmsStaticDataProvider } from "crownpeak-dxm-sdk-core";
 
 export default class CmsStaticPage extends CmsPage {
     constructor(props) {
