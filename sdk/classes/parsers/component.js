@@ -253,7 +253,7 @@ const findCmsFieldFromVariable = (content, component, variable, comment) => {
         //console.warn(`No definition found for ${variable}, defaulting to text`);
         //result = { cmsfield: variable, type: "TEXT" };
         // Fall back to remove surrounding { and }
-        console.warn(`COMPONENT: ${_componentName} - No definition found for ${variable}, removing { and }`);
+        //console.warn(`COMPONENT: ${_componentName} - No definition found for ${variable}, removing { and }`);
         result = {};
     }
     if (comment) result.comment = true;
