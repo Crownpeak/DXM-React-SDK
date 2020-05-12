@@ -7,11 +7,10 @@
   "author": "Crownpeak Technology, inc.",
   "license": "MIT",
   "scripts": {
-    "start": "node_modules/.bin/webpack-dev-server --progress --inline --hot",
-    "crownpeak": "./node_modules/crownpeak-dxm-react-sdk/cmsify"
+    "start": "node_modules/.bin/webpack-dev-server --progress --inline --hot"
   },
   "dependencies": {
-    "crownpeak-dxm-react-sdk": "^1.0.7",
+    "crownpeak-dxm-react-sdk": "^1.0.8",
     "history": "^4.10.1",
     "json-loader": "^0.5.7",
     "react": "^15.5.4",

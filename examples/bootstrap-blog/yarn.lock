@@ -1746,10 +1746,10 @@ crownpeak-dxm-accessapi-helper@^1.0.2:
     request-promise "^4.2.4"
     request-promise-native "^1.0.7"
 
-crownpeak-dxm-react-sdk@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/crownpeak-dxm-react-sdk/-/crownpeak-dxm-react-sdk-1.0.7.tgz#f070f5ff574171a46d0ac2c66f6481879a5dee83"
-  integrity sha512-jmUwimV3BDZUavOd+xfnjRQ5W169/rH3nnviInOl1EXmoa9JvOniRDPBeX+9HewUl4TsDzk5ggi2eXv47is7bA==
+crownpeak-dxm-react-sdk@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/crownpeak-dxm-react-sdk/-/crownpeak-dxm-react-sdk-1.0.8.tgz#9400b996b7c12718a669051fc166b5eb13fcb64d"
+  integrity sha512-L+m0je3MWwjpnaFJqnQV2Wk8yGiNY/9NxOLe4dHy/nVb7BxW3gdI4llFobfedTKiEieY7q7ig2HbL0BjysMiBg==
   dependencies:
     "@babel/parser" "^7.9.4"
     crownpeak-dxm-accessapi-helper "^1.0.2"

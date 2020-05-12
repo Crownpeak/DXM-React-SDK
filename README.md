@@ -1,8 +1,10 @@
 <a href="https://www.crownpeak.com" target="_blank">![Crownpeak Logo](images/crownpeak-logo.png?raw=true "Crownpeak Logo")</a>
 
+
 # Crownpeak Digital Experience Management (DXM) Software Development Kit (SDK) for React
 Crownpeak Digital Experience Management (DXM) Software Development Kit (SDK) for React has been constructed to assist
 the Single Page App developer in developing client-side applications that leverage DXM for content management purposes.
+
 
 ## Benefits
 * **Runtime libraries to handle communication with either Dynamic (DXM Dynamic Content API) or Static (On-disk JSON payload)
@@ -35,17 +37,18 @@ Data Sources**
     * Creates a new Model for the React Page Content-Type, via the CMS Access API, so that authors can create multiple versions
    of a structured Page or Component, without needing to run an entire development/test cycle.
 
+
 ## Install
- ```
-npm install react-html-parser
-# or 
-yarn add react-html-parser
 ```
- 
+yarn add crownpeak-dxm-react-sdk
+# or 
+npm install crownpeak-dxm-react-sdk
+```
+
 ## Usage - Runtime Data Libraries
- Review example project at <a href="https://github.com/Crownpeak/DXM-React-SDK/tree/master/examples/bootstrap" target="_blank">https://github.com/Crownpeak/DXM-React-SDK/tree/master/examples/bootstrap</a>
+ Review example project at <a href="https://github.com/Crownpeak/DXM-React-SDK/tree/master/examples/bootstrap-blog" target="_blank">https://github.com/Crownpeak/DXM-React-SDK/tree/master/examples/bootstrap-blog</a>
  for complete usage options. The example project includes the following capabilities:
-  * Routing using ```react-router``` and JSON payload, delivered from DXM to map AssetId to requested path. Although
+  * Routing using ```React-Router``` and JSON payload, delivered from DXM to map AssetId to requested path. Although
   not part of the SDK itself, the example can be used if desired. For routes.json structure, see example at the foot of this README.
   * ```CmsStaticPage``` type to load payload data from JSON file on filesystem, delivered by DXM;
   * ```CmsDynamicPage``` type to load payload data from DXM Dynamic Content API.
@@ -53,20 +56,60 @@ yarn add react-html-parser
 
 ### CmsStaticPage Type
 Loads payload data from JSON file on filesystem - expects knowledge of DXM AssetId in order to find file with corresponding
-name (e.g., 12345.json). CmsStaticPage is the data equivalent of a DXM Asset when used as a page. Example at /examples/bootstrap/pages/blogPage.js:
+name (e.g., 12345.json). CmsStaticPage is the data equivalent of a DXM Asset when used as a page. Example at /examples/bootstrap-blog/pages/blogPage.js:
 ```
 import React from 'react'
+import Header from "../components/header";
+import TopicList from "../components/topicList";
+import FeaturedPost from "../components/featuredPost";
+import SecondaryPost from "../components/secondaryPost";
 import BlogPost from "../components/blogPost";
-import { CmsStaticPage } from 'crownpeak-dxm-react-sdk';
+import PostArchives from "../components/postArchives";
+import Footer from "../components/footer";
+import { CmsStaticPage, CmsDynamicPage } from 'crownpeak-dxm-react-sdk';
+import Routing from "../js/routing";
 
 export default class BlogPage extends CmsStaticPage
 {
+    constructor(props)
+    {
+        super(props);
+        if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
+    }
+
     render() {
         super.render();
         return (
+            <div>
                 <div className="container">
-                    <BlogPost/>
+                    <Header month={this.props.match.params.month}/>
+                    <TopicList/>
+                    <div className="jumbotron p-3 p-md-5 text-white rounded bg-dark">
+                        <FeaturedPost/>
+                    </div>
+                    <div className="row mb-2">
+                        <div className="col-md-6">
+                            <SecondaryPost/>
+                        </div>
+                        <div className="col-md-6">
+                            <SecondaryPost/>
+                        </div>
+                    </div>
                 </div>
+                <main role="main" className="container">
+                    <div className="row">
+                        <div className="col-md-8 blog-main">
+                            <h3 className="pb-3 mb-4 font-italic border-bottom">
+                                From the Firehose
+                            </h3>
+                            <BlogPost/>
+                        </div>
+                        <aside className="col-md-4 blog-sidebar">
+                            <PostArchives/>
+                        </aside>
+                    </div>
+                </main>
+                <Footer/>
             </div>
         )
     }
@@ -74,20 +117,60 @@ export default class BlogPage extends CmsStaticPage
 ```
 
 ### CmsDynamicPage Type
-Loads payload data from DXM Dynamic Content API upon request - expects knowledge of DXM AssetId. Example at /examples/bootstrap/pages/blogPage.js:
+Loads payload data from DXM Dynamic Content API upon request - expects knowledge of DXM AssetId. Example at /examples/bootstrap-blog/pages/blogPage.js:
  ```
 import React from 'react'
+import Header from "../components/header";
+import TopicList from "../components/topicList";
+import FeaturedPost from "../components/featuredPost";
+import SecondaryPost from "../components/secondaryPost";
 import BlogPost from "../components/blogPost";
-import { CmsDynamicPage } from 'crownpeak-dxm-react-sdk';
+import PostArchives from "../components/postArchives";
+import Footer from "../components/footer";
+import { CmsStaticPage, CmsDynamicPage } from 'crownpeak-dxm-react-sdk';
+import Routing from "../js/routing";
 
 export default class BlogPage extends CmsDynamicPage
 {
+    constructor(props)
+    {
+        super(props);
+        if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
+    }
+
     render() {
         super.render();
         return (
+            <div>
                 <div className="container">
-                    <BlogPost/>
+                    <Header month={this.props.match.params.month}/>
+                    <TopicList/>
+                    <div className="jumbotron p-3 p-md-5 text-white rounded bg-dark">
+                        <FeaturedPost/>
+                    </div>
+                    <div className="row mb-2">
+                        <div className="col-md-6">
+                            <SecondaryPost/>
+                        </div>
+                        <div className="col-md-6">
+                            <SecondaryPost/>
+                        </div>
+                    </div>
                 </div>
+                <main role="main" className="container">
+                    <div className="row">
+                        <div className="col-md-8 blog-main">
+                            <h3 className="pb-3 mb-4 font-italic border-bottom">
+                                From the Firehose
+                            </h3>
+                            <BlogPost/>
+                        </div>
+                        <aside className="col-md-4 blog-sidebar">
+                            <PostArchives/>
+                        </aside>
+                    </div>
+                </main>
+                <Footer/>
             </div>
         )
     }
@@ -95,7 +178,7 @@ export default class BlogPage extends CmsDynamicPage
 ```
 
 ### CmsComponent
-Includes CmsField references for content rendering from DXM within a React Component. Example at /examples/bootstrap/components/blogPost.js:
+Includes CmsField references for content rendering from DXM within a React Component. Example at /examples/bootstrap-blog/components/blogPost.js:
 ```
 import React from 'react';
 import { CmsComponent, CmsField, CmsFieldTypes } from 'crownpeak-dxm-react-sdk';
@@ -138,7 +221,7 @@ Enumeration containing field types supported within the SDK.
 
 
 ### Querying Custom Data from Dynamic Content API
-Used to run a one-time dynamic query from DXM's Dynamic Content API. Example at /examples/bootstrap/components/postArchives.js:
+Used to run a one-time dynamic query from DXM's Dynamic Content API. Example at /examples/bootstrap-blog/components/postArchives.js:
 ```
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -169,7 +252,7 @@ export default class PostArchives extends CmsComponent
 ```
 
 ### Using Custom Data from Named JSON Object on Filesystem
-Used to load content from a JSON Object on Filesystem and populate fields in CmsComponent. Example at /examples/bootstrap/components/topicList.js:
+Used to load content from a JSON Object on Filesystem and populate fields in CmsComponent. Example at /examples/bootstrap-blog/components/topicList.js:
 ```
 import React from 'react';
 import { CmsComponent, CmsStaticDataProvider } from 'crownpeak-dxm-react-sdk';
@@ -197,7 +280,7 @@ export default class TopicList extends CmsComponent
 ```
 
 ## Usage - DXM Content-Type Scaffolding (cmsify)
-Requires manual update to DXM Component Library, by installing <a href="./dxm/dxm-cl-patch-for-react-sdk-2020MAY05.xml" target="_blank">dxm-cl-patch-for-react-sdk-2020MAY05.xml</a>
+Requires manual update to DXM Component Library, by installing <a href="https://raw.githubusercontent.com/Crownpeak/DXM-SDK-Core/master/dxm/dxm-cl-patch-for-react-sdk-2020MAY05.xml" target="_blank">dxm-cl-patch-for-React-sdk-2020MAY05.xml</a>
 using Crownpeak DXM Content Xcelerator℠ (<a href="https://github.com/Crownpeak/Content-Xcelerator" target="_blank">https://github.com/Crownpeak/Content-Xcelerator</a>).
 
 Installation instructions:
@@ -217,15 +300,25 @@ Requires .env file located in root of the React project to be scaffolded. Values
 | CMS_WORKFLOW  | DXM Workflow Id (to be applied to created Models).                        |
 | CMS_SERVER    | (Optional) Allows base Crownpeak DXM URL to be overridden.                |
 
+```
+# Crownpeak DXM Configuration
+CMS_INSTANCE={Replace with CMS Instance Name}
+CMS_USERNAME={Replace with CMS Username}
+CMS_PASSWORD={Replace with CMS Password}
+CMS_API_KEY={Replace with CMS Developer API Key}
+CMS_SITE_ROOT={Replace with Asset Id of Site Root}
+CMS_PROJECT={Replace with Asset Id of Project}
+CMS_WORKFLOW={Replace with Workflow Id}
+CMS_STATIC_CONTENT_LOCATION=/content/json
+CMS_DYNAMIC_CONTENT_LOCATION=//searchg2.crownpeak.net/{Replace with Search G2 Collection Name}/select/?wt=json
+```
+
 From the root of the project to be React scaffolded:
 
 ```
 $ yarn crownpeak
 yarn run v1.22.0
 $ ../../sdk/cmsify
-COMPONENT: Header - No definition found for props, removing { and }
-COMPONENT: PostArchives - No definition found for months, removing { and }
-COMPONENT: TopicList - No definition found for topics, removing { and }
 Uploaded [holder.min.js] as [/Skunks Works/React SDK/_Assets/js/holder.min.js] (261402)
 Unable to find source file [/Users/paul.taylor/Documents/Repos/Crownpeak/DXM-React-SDK/examples/bootstrap/js/bundle.js] for upload
 Uploaded [blog.css] as [/Skunks Works/React SDK/_Assets/css/blog.css] (261400)
@@ -243,7 +336,7 @@ Saved content folder [Blog Pages] as [/Skunks Works/React SDK/Blog Pages/] (2613
 ✨  Done in 62.61s.
 ```
 
-cmsify can be run multiple times as additional capabilities are added to the React project. Asset data within DXM will not
+The scaffolding can be run multiple times as additional capabilities are added to the React project. Asset data within DXM will not
 be destroyed by future runs.
 
 ## routes.json File Structure Example
@@ -263,29 +356,16 @@ be destroyed by future runs.
 ]
 ```
 
-## .env File Structure Example
-```
-# Crownpeak DXM Configuration
-CMS_INSTANCE={Replace with CMS Instance Name}
-CMS_USERNAME={Replace with CMS Username}
-CMS_PASSWORD={Replace with CMS Password}
-CMS_API_KEY={Replace with CMS Developer API Key}
-CMS_SITE_ROOT={Replace with Asset Id of Site Root}
-CMS_PROJECT={Replace with Asset Id of Project}
-CMS_WORKFLOW={Replace with Workflow Id}
-CMS_STATIC_CONTENT_LOCATION=/content/json
-CMS_DYNAMIC_CONTENT_LOCATION=//searchg2.crownpeak.net/{Replace with Search G2 Collection Name}/select/?wt=json
-```
-
 ## Videos & Tutorials
 Walk through of creating /examples/bootstrap-homepage from scratch, starting with an empty folder.
 <a href="https://view.vzaar.com/21495120/player" target="_blank">![Crownpeak DXM SDK for React Video](./images/crownpeak-dxm-sdk-for-react-title-frame.png?raw=true "Crownpeak DXM SDK for React Video")</a>
 
- 
+
 ## Credit
 Thanks to:
 * <a href="https://github.com/richard-lund" target="_blank">Richard Lund</a> for the refactoring;
 * <a href="https://github.com/ptylr" target="_blank">Paul Taylor</a> for a few edits ;)
+ 
  
 ## License
 MIT License
