@@ -46,3 +46,4 @@ Data Sources**
 | 1.0.4         | 2020MAY05     | Correct paths in cmsify script.    |
 | 1.0.5         | 2020MAY07     | Changed to use crownpeak-dxm-accessapi-helper.    |
 | 1.0.7         | 2020MAY11     | Changed to use crownpeak-dxm-sdk-core.    |
+| 1.0.8         | 2020MAY12     | cmsify.js now called from Node /.bin.    |
