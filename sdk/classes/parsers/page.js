@@ -118,16 +118,18 @@ const processCmsPageReturn = (content, page, render, imports) => {
 };
 
 const processCmsPagePattern = (content, component, object, replacements, imports) => {
-    const children = object.children || object.argument.children || [];
-    for (let i = 0, len = children.length; i < len; i++) {
-        const child = children[i];
-        //console.log(`Child ${i} = ${child.type}`);
-        if (child.type === "JSXElement" && child.openingElement && child.openingElement.name
-            && imports.find(i => child.openingElement.name.name === i)) {
-            processJsxElement(content, component, child, replacements);
-        }
-        if (child.children) {
-            processCmsPagePattern(content, component, child, replacements, imports);
+    if (object.type === "JSXElement" && object.openingElement && object.openingElement.name
+        && imports.find(i => object.openingElement.name.name === i)) {
+        processJsxElement(content, component, object, replacements);
+    } else {
+        const keys = Object.keys(object);
+        for (let i in keys) {
+            const key = keys[i];
+            if (key === "loc") continue; // Shortcut to avoid things we don't need
+            const value = object[key];
+            if (typeof value === "object" && value !== null) {
+                processCmsPagePattern(content, component, value, replacements, imports);
+            }
         }
     }
 };
