@@ -36,7 +36,7 @@ const parse = (content) => {
                 const name = part.declaration.id.name;
                 const result = processCmsPage(content, ast, part.declaration, imports);
                 if (result) {
-                    results.push({name: name, content: finalProcessMarkup(result)});
+                    results.push({name: name, content: finalProcessMarkup(result), wrapper: findWrapperName(part.declaration)});
                 }
             }
         }
@@ -140,6 +140,34 @@ const processJsxElement = (content, component, object, replacements) => {
     let previouslyUsed = replacements.filter(r => r.component === componentName);
     if (previouslyUsed && previouslyUsed.length > 0) prefix = `${componentName}_${previouslyUsed.length + 1}:`;
     replacements.push({start: object.start, end: object.end, component: componentName, value: `{${prefix}${componentName}}`});
+};
+
+const findWrapperName = (object) => {
+    if (object.type === "ExpressionStatement"
+        && object.expression && object.expression.type === "AssignmentExpression" && object.expression.operator === "="
+        && object.expression.left && object.expression.left.type === "MemberExpression"
+        && object.expression.left.object && object.expression.left.object.type === "ThisExpression"
+        && object.expression.left.property && object.expression.left.property.type === "Identifier"
+        && object.expression.left.property.name === "cmsWrapper"
+        && object.expression.right && object.expression.right.type === "StringLiteral") {
+        // Items of the form
+        // this.cmsWrapper = "MyWrapperName";
+        //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value} and type ${object.expression.right.arguments[1].property.name}`);
+        return object.expression.right.value;
+    }
+
+    // Recurse
+    const validFields = ["body","expression","callee","object"];
+    for (let i in validFields) {
+        let sub = object[validFields[i]];
+        if (sub) {
+            if (!sub.length) sub = [sub];
+            for (var j = 0; j < sub.length; j++) {
+                let result = findWrapperName(sub[j]);
+                if (result) return result;
+            }
+        }
+    }
 };
 
 module.exports = {
