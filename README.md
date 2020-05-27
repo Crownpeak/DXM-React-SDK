@@ -74,6 +74,7 @@ export default class BlogPage extends CmsStaticPage
     constructor(props)
     {
         super(props);
+        this.cmsWrapper = ""; //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
         if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
     }
 
@@ -135,6 +136,7 @@ export default class BlogPage extends CmsDynamicPage
     constructor(props)
     {
         super(props);
+        this.cmsWrapper = ""; //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
         if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
     }
 
