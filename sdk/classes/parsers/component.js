@@ -9,7 +9,7 @@ const reComponentType3 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*
 const parse = (content) => {
     const ast = babelParser.parse(content, {
         sourceType: "module",
-        plugins: ["jsx"]
+        plugins: ["jsx", "classProperties"]
     });
     //console.log(JSON.stringify(ast));
     if (ast.errors && ast.errors.length > 0) {
