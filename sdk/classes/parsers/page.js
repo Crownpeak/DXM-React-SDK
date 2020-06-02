@@ -1,8 +1,13 @@
 const babelParser = require("@babel/parser");
+const fs = require("fs");
+const path = require('path');
+const extensions = [".js", ".ts"];
 
 let _pageName = "";
+let _fileName = "";
 
-const parse = (content) => {
+const parse = (content, file) => {
+    _fileName = file;
     const ast = babelParser.parse(content, {
         sourceType: "module",
         plugins: ["jsx"]
@@ -23,8 +28,8 @@ const parse = (content) => {
                 const specifier = part.specifiers[i];
                 if ((specifier.type === "ImportDefaultSpecifier" || specifier.type === "ImportSpecifier")
                     && specifier.local && specifier.local.type === "Identifier") {
-                    //console.log(`Found import ${specifier.local.name}`);
-                    imports.push(specifier.local.name);
+                    //console.log(`Found import ${specifier.local.name}, ${part.source.value}`);
+                    imports.push({name: specifier.local.name, source: part.source.value});
                 }
             }
         }
@@ -119,8 +124,8 @@ const processCmsPageReturn = (content, page, render, imports) => {
 
 const processCmsPagePattern = (content, component, object, replacements, imports) => {
     if (object.type === "JSXElement" && object.openingElement && object.openingElement.name
-        && imports.find(i => object.openingElement.name.name === i)) {
-        processJsxElement(content, component, object, replacements);
+        && imports.find(i => object.openingElement.name.name === i.name)) {
+        processJsxElement(content, component, object, replacements, imports.find(i => object.openingElement.name.name === i.name));
     } else {
         const keys = Object.keys(object);
         for (let i in keys) {
@@ -134,12 +139,30 @@ const processCmsPagePattern = (content, component, object, replacements, imports
     }
 };
 
-const processJsxElement = (content, component, object, replacements) => {
+const processJsxElement = (content, component, object, replacements, importDefinition) => {
     const componentName = object.openingElement.name.name;
     let prefix = "";
     let previouslyUsed = replacements.filter(r => r.component === componentName);
     if (previouslyUsed && previouslyUsed.length > 0) prefix = `${componentName}_${previouslyUsed.length + 1}:`;
+    if (isDropZoneComponent(componentName, importDefinition)) return; // DropZones are processed by TemplateBuilder
     replacements.push({start: object.start, end: object.end, component: componentName, value: `{${prefix}${componentName}}`});
+};
+
+const isDropZoneComponent = (componentName, importDefinition) => {
+    //console.log(`Checking ${componentName} (${JSON.stringify(importDefinition)}) for extending CmsDropZoneComponent`);
+    const content = getSource(importDefinition.source);
+    return content.indexOf(` class ${componentName} extends CmsDropZoneComponent`) > -1;
+};
+
+const getSource = (source) => {
+    source = path.resolve(path.dirname(_fileName), source);
+    if (fs.existsSync(source)) return fs.readFileSync(source);
+
+    for (let i in extensions) {
+        const ext = extensions[i];
+        if (fs.existsSync(source + ext)) return fs.readFileSync(source + ext);
+    }
+    return "";
 };
 
 const findWrapperName = (object) => {
