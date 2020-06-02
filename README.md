@@ -210,6 +210,32 @@ export default class BlogPost extends CmsComponent
 }
 ```
 
+### CmsDropZoneComponent
+Enables implementation of draggable components via DXM. Example usage below:
+```
+import { CmsDropZoneComponent } from 'crownpeak-dxm-react-sdk';
+
+import PrimaryCTA from "../components/primaryCta";
+import SecondaryCTA from "../components/secondaryCta";
+
+export default class DropZone extends CmsDropZoneComponent {
+    constructor(props)
+    {
+        super(props);
+        this.components = {
+            "PrimaryCTA": PrimaryCTA,
+            "SecondaryCTA": SecondaryCTA
+        };
+    }
+}
+```
+
+Example implementation upon a ```CmsStaticPage``` or ```CmsDynamicPage```:
+```
+<DropZone name="Test"/>
+```
+For further details, see examples/bootstrap-homepage project.
+
 ### CmsFieldType
 Enumeration containing field types supported within the SDK.
 
@@ -282,7 +308,7 @@ export default class TopicList extends CmsComponent
 ```
 
 ## Usage - DXM Content-Type Scaffolding (cmsify)
-Requires manual update to DXM Component Library, by installing <a href="https://raw.githubusercontent.com/Crownpeak/DXM-SDK-Core/master/dxm/dxm-cl-patch-for-react-sdk-2020MAY05.xml" target="_blank">dxm-cl-patch-for-React-sdk-2020MAY05.xml</a>
+Requires manual update to DXM Component Library, by installing <a href="https://raw.githubusercontent.com/Crownpeak/DXM-SDK-Core/master/dxm/dxm-cl-patch-for-react-sdk-2020JUN02.xml" target="_blank">dxm-cl-patch-for-React-sdk-2020JUN02.xml</a>
 using Crownpeak DXM Content Xcelerator℠ (<a href="https://github.com/Crownpeak/Content-Xcelerator" target="_blank">https://github.com/Crownpeak/Content-Xcelerator</a>).
 
 Installation instructions:

@@ -48,3 +48,4 @@ Data Sources**
 | 1.0.7         | 2020MAY11     | Changed to use crownpeak-dxm-sdk-core.    |
 | 1.0.8         | 2020MAY12     | cmsify.js now called from Node /.bin.    |
 | 1.0.10         | 2020MAY27     | Added CSS parsing/upload support. Added Wrapper selection.    |
+| 1.0.11         | 2020JUN02     | Added DropZone support for DXM. Added command line parameters. Bug fixes.    |
