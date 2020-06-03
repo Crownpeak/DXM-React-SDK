@@ -4,7 +4,8 @@ let _componentName = "";
 
 const reComponentType1 = /^\s*this.([a-z0-9_]+)\s*$/i;
 const reComponentType2 = /^\s*this\s*\[\s*(["'])([a-z0-9_]+)\s*\1\s*\]\s*$/i;
-const reComponentType3 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*CmsFieldTypes.([a-z0-9]+)\s*[)]\s*$/i;
+const reComponentType3 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*CmsFieldTypes.([a-z0-9]+)/i;
+const reComponentType4 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*(["'])([a-z0-9_]+)\3/i;
 
 const parse = (content) => {
     const ast = babelParser.parse(content, {
@@ -186,12 +187,23 @@ const processJsxExpressionSub = (content, component, object, imports) => {
         //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].property.name}`);
         return { cmsfield: object.arguments[0].value, type: object.arguments[1].property.name };
     }
+    else if (object.type === "NewExpression"
+        && object.callee && object.callee.type == "Identifier" && object.callee.name === "CmsField"
+        && object.arguments && object.arguments.length > 1
+        && object.arguments[0].type === "StringLiteral"
+        && object.arguments[1].type === "StringLiteral") {
+        // Items of the form
+        // { new CmsField("field_name", "FieldType") }
+        //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].value}`);
+        return { cmsfield: object.arguments[0].value, type: object.arguments[1].value };
+    }
     else if (object.type === "JSXEmptyExpression"
         && object.innerComments && object.innerComments.length > 0
         && object.innerComments[0].type === "CommentBlock"
         && (reComponentType1.test(object.innerComments[0].value)
             || reComponentType2.test(object.innerComments[0].value)
-            || reComponentType3.test(object.innerComments[0].value))
+            || reComponentType3.test(object.innerComments[0].value)
+            || reComponentType4.test(object.innerComments[0].value))
         ) {
         let match = reComponentType1.exec(object.innerComments[0].value);
         if (match) {
@@ -213,6 +225,13 @@ const processJsxExpressionSub = (content, component, object, imports) => {
             // { /*new CmsField("field_name", CmsFieldTypes.FieldType)*/ }
             //console.log(`Found commented field ${match[2]} type ${match[3]}`);
             return { cmsfield: match[2], type: match[3], comment: true };
+        }
+        match = reComponentType4.exec(object.innerComments[0].value);
+        if (match) {
+            // Items of the form
+            // { /*new CmsField("field_name", "FieldType")*/ }
+            //console.log(`Found commented field ${match[2]} type ${match[4]}`);
+            return { cmsfield: match[2], type: match[4], comment: true };
         }
     }
     // TODO: more complex expressions
@@ -278,6 +297,21 @@ const findCmsFieldFromVariableSub = (content, object, variable) => {
         // this.variable_name = new CmsField("field_name", CmsFieldTypes.FieldType);
         //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value} and type ${object.expression.right.arguments[1].property.name}`);
         return {cmsfield: object.expression.right.arguments[0].value, type: object.expression.right.arguments[1].property.name};
+    } else if (object.type === "ExpressionStatement"
+        && object.expression && object.expression.type === "AssignmentExpression" && object.expression.operator === "="
+        && object.expression.left && object.expression.left.type === "MemberExpression"
+        && object.expression.left.object && object.expression.left.object.type === "ThisExpression"
+        && object.expression.left.property && object.expression.left.property.type === "Identifier"
+        && object.expression.left.property.name === variable
+        && object.expression.right && object.expression.right.type === "NewExpression"
+        && object.expression.right.callee && object.expression.right.callee.type === "Identifier"&& object.expression.right.callee.name === "CmsField"
+        && object.expression.right.arguments && object.expression.right.arguments.length > 1
+        && object.expression.right.arguments[0].type === "StringLiteral"
+        && object.expression.right.arguments[1].type === "StringLiteral") {
+        // Items of the form
+        // this.variable_name = new CmsField("field_name", "FieldType");
+        //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value} and type ${object.expression.right.arguments[1].value}`);
+        return {cmsfield: object.expression.right.arguments[0].value, type: object.expression.right.arguments[1].value};
     }
 
     // Recurse
@@ -297,8 +331,11 @@ const findCmsFieldFromVariableSub = (content, object, variable) => {
 
 const cmsFieldTypeToString = (cmsFieldType) => {
     if (cmsFieldType === "IMAGE") return "Src";
-    // TODO: robusify this!
-    return cmsFieldType[0] + cmsFieldType.substr(1).toLowerCase();
+    if (cmsFieldType === cmsFieldType.toUpperCase()) {
+        // TODO: robusify this!
+        return cmsFieldType[0] + cmsFieldType.substr(1).toLowerCase();
+    }
+    return cmsFieldType;
 };
 
 module.exports = {
