@@ -50,3 +50,4 @@ Data Sources**
 | 1.0.10         | 2020MAY27     | Added CSS parsing/upload support. Added Wrapper selection.    |
 | 1.0.11         | 2020JUN02     | Added DropZone support for DXM. Added command line parameters. Bug fixes.    |
 | 1.0.12         | 2020JUN03     | Updated crownpeak-dxm-sdk-core version.    |
+| 1.0.13         | 2020JUN05     | String for CmsFieldType. HTML components now supported in Wrappers. CSS parser updated for relative files.    |
