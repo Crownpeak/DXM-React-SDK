@@ -1,6 +1,5 @@
 <a href="https://www.crownpeak.com" target="_blank">![Crownpeak Logo](images/crownpeak-logo.png?raw=true "Crownpeak Logo")</a>
 
-
 # Crownpeak Digital Experience Management (DXM) Software Development Kit (SDK) for React
 Crownpeak Digital Experience Management (DXM) Software Development Kit (SDK) for React has been constructed to assist
 the Single Page App developer in developing client-side applications that leverage DXM for content management purposes.
@@ -46,7 +45,7 @@ npm install crownpeak-dxm-react-sdk
 ```
 
 ## Usage - Runtime Data Libraries
- Review example project at <a href="https://github.com/Crownpeak/DXM-React-SDK/tree/master/examples/bootstrap-blog" target="_blank">https://github.com/Crownpeak/DXM-React-SDK/tree/master/examples/bootstrap-blog</a>
+ Review example project at <a href="https://github.com/Crownpeak/DXM-SDK-Examples/tree/master/React" target="_blank">https://github.com/Crownpeak/DXM-SDK-Examples/tree/master/React</a>
  for complete usage options. The example project includes the following capabilities:
   * Routing using ```React-Router``` and JSON payload, delivered from DXM to map AssetId to requested path. Although
   not part of the SDK itself, the example can be used if desired. For routes.json structure, see example at the foot of this README.
@@ -118,7 +117,7 @@ export default class BlogPage extends CmsStaticPage
 ```
 
 ### CmsDynamicPage Type
-Loads payload data from DXM Dynamic Content API upon request - expects knowledge of DXM AssetId. Example at /examples/bootstrap-blog/pages/blogPage.js:
+Loads payload data from DXM Dynamic Content API upon request - expects knowledge of DXM AssetId.
  ```
 import React from 'react'
 import Header from "../components/header";
@@ -180,7 +179,7 @@ export default class BlogPage extends CmsDynamicPage
 ```
 
 ### CmsComponent
-Includes CmsField references for content rendering from DXM within a React Component. Example at /examples/bootstrap-blog/components/blogPost.js:
+Includes CmsField references for content rendering from DXM within a React Component.:
 ```
 import React from 'react';
 import { CmsComponent, CmsField, CmsFieldTypes } from 'crownpeak-dxm-react-sdk';
@@ -249,7 +248,7 @@ Enumeration containing field types supported within the SDK.
 
 
 ### Querying Custom Data from Dynamic Content API
-Used to run a one-time dynamic query from DXM's Dynamic Content API. Example at /examples/bootstrap-blog/components/postArchives.js:
+Used to run a one-time dynamic query from DXM's Dynamic Content API.
 ```
 import React from 'react';
 import { Link } from 'react-router-dom';
@@ -280,7 +279,7 @@ export default class PostArchives extends CmsComponent
 ```
 
 ### Using Custom Data from Named JSON Object on Filesystem
-Used to load content from a JSON Object on Filesystem and populate fields in CmsComponent. Example at /examples/bootstrap-blog/components/topicList.js:
+Used to load content from a JSON Object on Filesystem and populate fields in CmsComponent.
 ```
 import React from 'react';
 import { CmsComponent, CmsStaticDataProvider } from 'crownpeak-dxm-react-sdk';
