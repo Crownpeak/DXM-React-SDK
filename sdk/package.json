@@ -1,6 +1,6 @@
 {
   "name": "crownpeak-dxm-react-sdk",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Crownpeak Digital Experience Management (DXM)Software Development Kit (SDK) for React has been constructed to assist the Single Page App developer in developing client-side applications that leverage DXM for content management purposes.",
   "repository": "https://github.com/Crownpeak/DXM-React-SDK",
   "main": "entry.js",
