@@ -6,9 +6,12 @@ const reComponentType1 = /^\s*this.([a-z0-9_]+)\s*$/i;
 const reComponentType2 = /^\s*this\s*\[\s*(["'])([a-z0-9_]+)\s*\1\s*\]\s*$/i;
 const reComponentType3 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*CmsFieldTypes.([a-z0-9]+)/i;
 const reComponentType4 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*(["'])([a-z0-9_]+)\3/i;
+const reList = /^([ \t]*){\s*\/\*\s*<List(.*?)\s*type=(["'])([^"']+?)\3(.*?)>\s*\*\/\s*}((.|\s)*?){\s*\/\*\s*\<\/List>\s*\*\/\s*}/im;
+const reListName = /\s+?name\s*=\s*(["'])([^"']+?)\1/i;
+const reListItemName = /\s+?itemName\s*=\s*(["'])([^"']+?)\1/i;
 
 const parse = (content) => {
-    const ast = babelParser.parse(content, {
+    let ast = babelParser.parse(content, {
         sourceType: "module",
         plugins: ["jsx", "classProperties"]
     });
@@ -21,7 +24,7 @@ const parse = (content) => {
     let results = [];
     let imports = [];
     let dependencies = [];
-    const bodyParts = ast.program.body;
+    let bodyParts = ast.program.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
         if (part.type === "ImportDeclaration" && part.specifiers && part.specifiers.length > 0) {
@@ -34,7 +37,19 @@ const parse = (content) => {
                 }
             }
         }
-        else if (part.type === "ExportDefaultDeclaration" || part.type === "ExportNamedDeclaration") {
+    }
+    // Parse out any special lists
+    content = replaceLists(content);
+
+    // Re-parse the content after our changes
+    ast = babelParser.parse(content, {
+        sourceType: "module",
+        plugins: ["jsx", "classProperties"]
+    });
+    bodyParts = ast.program.body;
+    for (let i = 0, len = bodyParts.length; i < len; i++) {
+        const part = bodyParts[i];
+        if (part.type === "ExportDefaultDeclaration" || part.type === "ExportNamedDeclaration") {
             if (part.declaration.type === "ClassDeclaration"
                 && part.declaration.superClass
                 && part.declaration.superClass.name === "CmsComponent") {
@@ -58,6 +73,35 @@ const finalProcessMarkup = (content) => {
     }
     content = content.replace(/className/ig, "class");
     return trimSharedLeadingWhitespace(content);
+};
+
+const replaceLists = (content) => {
+    let match;
+    while (match = reList.exec(content)) {
+        let attributes = " " + match[2] + " " + match[5];
+        let name = "";
+        let itemName = "";
+        const ws = match[1];
+        const type = match[4];
+        if (reListName.test(attributes)) {
+            const nameMatch = reListName.exec(attributes);
+            name = nameMatch[2];
+        }
+        if (reListItemName.test(attributes)) {
+            const nameMatch = reListItemName.exec(attributes);
+            itemName = nameMatch[2];
+        }
+        if (!name) {
+            name = type + "s"; // TODO: better way to make plural
+        }
+        if (!itemName) {
+            itemName = type;
+        }
+        //console.log(`Found list with name ${name}`);
+        const repl = `${ws}<cp-list name="${name}">\r\n${ws}  {new CmsField("${itemName}", "${type}")}\r\n${ws}</cp-list>`;
+        content = content.replace(match[0], repl);
+    }
+    return content;
 };
 
 const trimSharedLeadingWhitespace = (content) => {

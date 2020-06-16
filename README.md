@@ -307,7 +307,7 @@ export default class TopicList extends CmsComponent
 ```
 
 ## Usage - DXM Content-Type Scaffolding (cmsify)
-Requires manual update to DXM Component Library, by installing <a href="https://raw.githubusercontent.com/Crownpeak/DXM-SDK-Core/master/dxm/dxm-cl-patch-for-react-sdk-2020JUN09.xml" target="_blank">dxm-cl-patch-for-React-sdk-2020JUN09.xml</a>
+Requires manual update to DXM Component Library, by installing <a href="https://raw.githubusercontent.com/Crownpeak/DXM-SDK-Core/master/dxm/dxm-cl-patch-for-react-sdk-2020JUN16.xml" target="_blank">dxm-cl-patch-for-React-sdk-2020JUN16.xml</a>
 using Crownpeak DXM Content Xcelerator℠ (<a href="https://github.com/Crownpeak/Content-Xcelerator" target="_blank">https://github.com/Crownpeak/Content-Xcelerator</a>).
 
 Installation instructions:
