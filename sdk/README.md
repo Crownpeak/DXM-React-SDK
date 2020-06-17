@@ -52,3 +52,4 @@ Data Sources**
 | 1.0.12         | 2020JUN03     | Updated crownpeak-dxm-sdk-core version.    |
 | 1.0.13         | 2020JUN05     | String for CmsFieldType. HTML components now supported in Wrappers. CSS parser updated for relative files.    |
 | 1.0.14         | 2020JUN10     | Verify environment before processing. Manual re-compilation of Component Library. Support attributes & children on DropZone components. Bug fixes.    |
+| 1.0.15         | 2020JUN17     | Support for list items. Bug fixes.    |

@@ -229,6 +229,36 @@ export default class DropZone extends CmsDropZoneComponent {
 }
 ```
 
+### List Items
+Enables implementation of list items within DXM. Example usage below (note comment, which is requirement for DXM scaffolding):
+```
+import React from 'react';
+import {CmsComponent, CmsField, CmsFieldTypes } from 'crownpeak-dxm-react-sdk';
+import SecondaryContainer from './secondaryContainer';
+​
+export default class SecondaryList extends CmsComponent
+{
+    constructor(props)
+    {
+        super(props);
+        this.SecondaryContainers = new CmsField("SecondaryContainer", "Widget", window.cmsDataCache[window.cmsDataCache.cmsAssetId].SecondaryList);
+    }
+​
+    render () {
+        let i = 0;
+        return (
+            <div className="row">
+                {/* <List name="SecondaryContainers" type="Widget" itemName="_Widget"> */}
+                {this.SecondaryContainers.value.map(sc => {
+                    return <SecondaryContainer data={sc.SecondaryContainer} key={i++}/>
+                })}
+                {/* </List> */}
+            </div>
+        )
+    }
+}
+```
+
 Example implementation upon a ```CmsStaticPage``` or ```CmsDynamicPage```:
 ```
 <DropZone name="Test"/>
