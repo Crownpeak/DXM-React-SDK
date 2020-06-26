@@ -3,6 +3,8 @@ import { CmsDataCache } from "crownpeak-dxm-sdk-core";
 import { ReactNode } from "React";
 
 export default class CmsPage extends CmsCore {
+    cmsWrapper?: string;
+
     render(): ReactNode
     {
         this.cmsDataProvider.getSingleAsset(this.cmsAssetId);
