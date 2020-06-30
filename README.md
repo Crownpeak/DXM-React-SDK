@@ -275,6 +275,7 @@ Enumeration containing field types supported within the SDK.
 | DATE          | DateTime        |
 | DOCUMENT      | Document        |
 | IMAGE         | Image           |
+| HREF          | Href           |
 
 
 ### Querying Custom Data from Dynamic Content API
@@ -401,10 +402,10 @@ The `crownpeak` script supports a number of optional command-line parameters:
 | Parameter        | Effect        |
 | ---------------- | --------------|
 | `--dry-run`      | Report on the items that would be imported into the CMS, but do not import them. |
-| `--nocomponents` | Do not import any components. |
-| `--nopages`      | Do not import any pages, templates, or models. |
-| `--nouploads`    | Do not import any uploads; for example CSS, JavaScript or images. |
-| `--nowrappers`   | Do not import any wrappers. |
+| `--no-components` | Do not import any components. |
+| `--no-pages`      | Do not import any pages, templates, or models. |
+| `--no-uploads`    | Do not import any uploads; for example CSS, JavaScript or images. |
+| `--no-wrappers`   | Do not import any wrappers. |
 
 These are intended to improve performance for multiple runs, and you should expect to see errors if the items being skipped have not already been created within the CMS; for example, if you provide the `--nocomponents` parameter where the components have not previously been imported.
 
