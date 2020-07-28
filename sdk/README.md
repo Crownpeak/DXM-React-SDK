@@ -54,4 +54,4 @@ Data Sources**
 | 1.0.14         | 2020JUN10     | Verify environment before processing. Manual re-compilation of Component Library. Support attributes & children on DropZone components. Bug fixes.    |
 | 1.0.15         | 2020JUN17     | Support for list items. Bug fixes.    |
 | 2.0.0         | 2020JUN30     | Migrated to TypeScript.    |
-| 2.1.0         | 2020JUL28     | New 'init', 'patch' and 'scaffold' options, improved output, lots of bug fixes. |
+| 2.1.1         | 2020JUL28     | New 'init', 'patch' and 'scaffold' options, improved output, lots of bug fixes. |
