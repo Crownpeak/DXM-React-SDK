@@ -10,7 +10,6 @@
     "@babel/parser": "^7.9.4",
     "crownpeak-dxm-sdk-core": "^2.0.0",
     "dotenv": "^8.2.0",
-    "minimist": "^1.2.5",
     "react": "^15.5.4"
   },
   "bin": {
