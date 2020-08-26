@@ -4,8 +4,8 @@ let _componentName = "";
 
 const reComponentType1 = /^\s*this.([a-z0-9_]+)\s*$/i;
 const reComponentType2 = /^\s*this\s*\[\s*(["'])([a-z0-9_]+)\s*\1\s*\]\s*$/i;
-const reComponentType3 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*CmsFieldTypes.([a-z0-9]+)/i;
-const reComponentType4 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*(["'])([a-z0-9_]+)\3/i;
+const reComponentType3 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*CmsFieldTypes.([a-z0-9]+)(\s*,.*,\s*CmsIndexedField\.([a-z]+))?/i;
+const reComponentType4 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*(["'])([a-z0-9_]+)\3(\s*,.*,\s*CmsIndexedField\.([a-z]+))?/i;
 const reList = /^([ \t]*){\s*\/\*\s*<List(.*?)\s*type=(["'])([^"']+?)\3(.*?)>\s*\*\/\s*}((.|\s)*?){\s*\/\*\s*\<\/List>\s*\*\/\s*}/im;
 const reListName = /\s+?name\s*=\s*(["'])([^"']+?)\1/i;
 const reListItemName = /\s+?itemName\s*=\s*(["'])([^"']+?)\1/i;
@@ -193,8 +193,10 @@ const processJsxExpression = (content, component, object, replacements, imports)
             result = findCmsFieldFromVariable(content, component, result.thisproperty, result.comment);
         }
         if (result.cmsfield) {
-            //console.log(`Replacing ${content.slice(object.start, object.end)} with {${result.cmsfield}:${cmsFieldTypeToString(result.type)}}`);
-            replacements.push({start: object.start, end: object.end, value: `${result.comment ? "<!-- " : ""}{${result.cmsfield}:${cmsFieldTypeToString(result.type)}}${result.comment ? " -->" : ""}`});
+            let indexedField = cmsIndexedFieldToString(result.indexedField);
+            if (indexedField) indexedField = ":" + indexedField;
+            //console.log(`Replacing ${content.slice(object.start, object.end)} with {${result.cmsfield}:${cmsFieldTypeToString(result.type)}${indexedField}}`);
+            replacements.push({start: object.start, end: object.end, value: `${result.comment ? "<!-- " : ""}{${result.cmsfield}:${cmsFieldTypeToString(result.type)}${indexedField}}${result.comment ? " -->" : ""}`});
         } else {
             // Trim first and last character to remove { and }
             replacements.push({start: object.start, end: object.end, value: content.slice(object.start + 1, object.end - 1)});
@@ -226,20 +228,34 @@ const processJsxExpressionSub = (content, component, object, imports) => {
         && object.arguments[1].type === "MemberExpression"
         && object.arguments[1].object && object.arguments[1].object.type === "Identifier" && object.arguments[1].object.name === "CmsFieldTypes"
         && object.arguments[1].property) {
-        // Items of the form
-        // { new CmsField("field_name", CmsFieldTypes.FieldType) }
-        //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].property.name}`);
-        return { cmsfield: object.arguments[0].value, type: object.arguments[1].property.name };
+        if (object.arguments.length > 3 && object.arguments[3].object && object.arguments[3].object.type === "Identifier" && object.arguments[3].object.name === "CmsIndexedField") {
+            // Items of the form
+            // { new CmsField("field_name", CmsFieldTypes.FieldType, something, CmsIndexedField.TYPE) }
+            //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].property.name} indexedField ${object.arguments[3].property.name}`);
+            return { cmsfield: object.arguments[0].value, type: object.arguments[1].property.name, indexedField: object.arguments[3].property.name };
+        } else {
+            // Items of the form
+            // { new CmsField("field_name", CmsFieldTypes.FieldType) }
+            //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].property.name}`);
+            return { cmsfield: object.arguments[0].value, type: object.arguments[1].property.name };
+        }
     }
     else if (object.type === "NewExpression"
         && object.callee && object.callee.type == "Identifier" && object.callee.name === "CmsField"
         && object.arguments && object.arguments.length > 1
         && object.arguments[0].type === "StringLiteral"
         && object.arguments[1].type === "StringLiteral") {
-        // Items of the form
-        // { new CmsField("field_name", "FieldType") }
-        //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].value}`);
-        return { cmsfield: object.arguments[0].value, type: object.arguments[1].value };
+        if (object.arguments.length > 3 && object.arguments[3].object && object.arguments[3].object.type === "Identifier" && object.arguments[3].object.name === "CmsIndexedField") {
+            // Items of the form
+            // { new CmsField("field_name", "FieldType", something, CmsIndexedField.TYPE) }
+            //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].value} indexedField ${object.arguments[3].property.name}`);
+            return { cmsfield: object.arguments[0].value, type: object.arguments[1].value, indexedField: object.arguments[3].property.name };
+        } else {
+            // Items of the form
+            // { new CmsField("field_name", "FieldType") }
+            //console.log(`Found field ${object.arguments[0].value} type ${object.arguments[1].value}`);
+            return { cmsfield: object.arguments[0].value, type: object.arguments[1].value };
+        }
     }
     else if (object.type === "JSXEmptyExpression"
         && object.innerComments && object.innerComments.length > 0
@@ -265,17 +281,31 @@ const processJsxExpressionSub = (content, component, object, imports) => {
         }
         match = reComponentType3.exec(object.innerComments[0].value);
         if (match) {
-            // Items of the form
-            // { /*new CmsField("field_name", CmsFieldTypes.FieldType)*/ }
-            //console.log(`Found commented field ${match[2]} type ${match[3]}`);
-            return { cmsfield: match[2], type: match[3], comment: true };
+            if (match.length > 5) {
+                // Items of the form
+                // { /*new CmsField("field_name", CmsFieldTypes.FieldType, something, CmsIndexedField.TYPE)*/ }
+                //console.log(`Found commented field ${match[2]} type ${match[3]} indexedField ${match[5]}`);
+                return { cmsfield: match[2], type: match[3], indexedField: match[5], comment: true };
+            } else {
+                // Items of the form
+                // { /*new CmsField("field_name", CmsFieldTypes.FieldType)*/ }
+                //console.log(`Found commented field ${match[2]} type ${match[3]}`);
+                return { cmsfield: match[2], type: match[3], comment: true };
+            }
         }
         match = reComponentType4.exec(object.innerComments[0].value);
         if (match) {
-            // Items of the form
-            // { /*new CmsField("field_name", "FieldType")*/ }
-            //console.log(`Found commented field ${match[2]} type ${match[4]}`);
-            return { cmsfield: match[2], type: match[4], comment: true };
+            if (match.length > 6) {
+                // Items of the form
+                // { /*new CmsField("field_name", "FieldType", something, CmsIndexedField.TYPE)*/ }
+                //console.log(`Found commented field ${match[2]} type ${match[4]} indexedField ${match[6]}`);
+                return { cmsfield: match[2], type: match[4], indexedField: match[6], comment: true };
+            } else {
+                // Items of the form
+                // { /*new CmsField("field_name", "FieldType")*/ }
+                //console.log(`Found commented field ${match[2]} type ${match[4]}`);
+                return { cmsfield: match[2], type: match[4], comment: true };
+            }
         }
     }
     // TODO: more complex expressions
@@ -336,11 +366,19 @@ const findCmsFieldFromVariableSub = (content, object, variable) => {
         && object.expression.right.arguments[0].type === "StringLiteral"
         && object.expression.right.arguments[1].type === "MemberExpression"
         && object.expression.right.arguments[1].object && object.expression.right.arguments[1].object.type === "Identifier" && object.expression.right.arguments[1].object.name === "CmsFieldTypes"
-        && object.expression.right.arguments[1].property) {
-        // Items of the form
-        // this.variable_name = new CmsField("field_name", CmsFieldTypes.FieldType);
-        //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value} and type ${object.expression.right.arguments[1].property.name}`);
-        return {cmsfield: object.expression.right.arguments[0].value, type: object.expression.right.arguments[1].property.name};
+        && object.expression.right.arguments[1].property ) {
+        if (object.expression.right.arguments.length > 3
+            && object.expression.right.arguments[3].object && object.expression.right.arguments[3].object.type === "Identifier" && object.expression.right.arguments[3].object.name === "CmsIndexedField") {
+            // Items of the form
+            // this.variable_name = new CmsField("field_name", CmsFieldTypes.FieldType, something, CmsIndexedField.Type);
+            //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value}, type ${object.expression.right.arguments[1].property.name} and indexedField ${object.expression.right.arguments[3].property.name}`);
+            return {cmsfield: object.expression.right.arguments[0].value, type: object.expression.right.arguments[1].property.name, indexedField: object.expression.right.arguments[3].property.name};
+        } else {
+            // Items of the form
+            // this.variable_name = new CmsField("field_name", CmsFieldTypes.FieldType);
+            //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value} and type ${object.expression.right.arguments[1].property.name}`);
+            return {cmsfield: object.expression.right.arguments[0].value, type: object.expression.right.arguments[1].property.name};
+        }
     } else if (object.type === "ExpressionStatement"
         && object.expression && object.expression.type === "AssignmentExpression" && object.expression.operator === "="
         && object.expression.left && object.expression.left.type === "MemberExpression"
@@ -352,10 +390,18 @@ const findCmsFieldFromVariableSub = (content, object, variable) => {
         && object.expression.right.arguments && object.expression.right.arguments.length > 1
         && object.expression.right.arguments[0].type === "StringLiteral"
         && object.expression.right.arguments[1].type === "StringLiteral") {
-        // Items of the form
-        // this.variable_name = new CmsField("field_name", "FieldType");
-        //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value} and type ${object.expression.right.arguments[1].value}`);
-        return {cmsfield: object.expression.right.arguments[0].value, type: object.expression.right.arguments[1].value};
+        if (object.expression.right.arguments.length > 3
+            && object.expression.right.arguments[3].object && object.expression.right.arguments[3].object.type === "Identifier" && object.expression.right.arguments[3].object.name === "CmsIndexedField") {
+            // Items of the form
+            // this.variable_name = new CmsField("field_name", "FieldType", something, CmsIndexedField.Type);
+            //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value}, type ${object.expression.right.arguments[1].value} and indexedField ${object.expression.right.arguments[3].property.name}`);
+            return {cmsfield: object.expression.right.arguments[0].value, type: object.expression.right.arguments[1].value, indexedField: object.expression.right.arguments[3].property.name};
+        } else {
+            // Items of the form
+            // this.variable_name = new CmsField("field_name", "FieldType");
+            //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value} and type ${object.expression.right.arguments[1].value}`);
+            return {cmsfield: object.expression.right.arguments[0].value, type: object.expression.right.arguments[1].value};
+        }
     }
 
     // Recurse
@@ -380,6 +426,16 @@ const cmsFieldTypeToString = (cmsFieldType) => {
         return cmsFieldType[0] + cmsFieldType.substr(1).toLowerCase();
     }
     return cmsFieldType;
+};
+
+const cmsIndexedFieldToString = (cmsIndexedField) => {
+    if (!cmsIndexedField || cmsIndexedField === "NONE") return "";
+    if (cmsIndexedField === "DATETIME") return "IndexedDateTime";
+    if (cmsIndexedField === cmsIndexedField.toUpperCase()) {
+        // TODO: robusify this!
+        return "Indexed" + cmsIndexedField[0] + cmsIndexedField.substr(1).toLowerCase();
+    }
+    return "Indexed" + cmsIndexedField;
 };
 
 module.exports = {
