@@ -66,6 +66,8 @@ const parse = (content) => {
 };
 
 const finalProcessMarkup = (content) => {
+    // Parse out any cp-scaffolds
+    content = replaceScaffolds(content);
     // Remove anything that has { and } but doesn't look like a component
     const replacer = /[{]([^}]*?[\s,/$()][^}]*?)[}]/g;
     while (replacer.test(content)) {
@@ -73,6 +75,25 @@ const finalProcessMarkup = (content) => {
     }
     content = content.replace(/className/ig, "class");
     return trimSharedLeadingWhitespace(content);
+};
+
+const replaceScaffolds = (content) => {
+    const scaffoldRegexs = [
+        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*(.*?)\\s*else\\s*\\*\\/\\}\\s*(.*?)\\s*\\{\\s*\\/\\*\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "$1"},
+        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*(.*?)\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "$1"}
+    ];
+    let result = content;
+    for (let j = 0, lenJ = scaffoldRegexs.length; j < lenJ; j++) {
+        let regex = new RegExp(scaffoldRegexs[j].source);
+        let match = regex.exec(result);
+        while (match) {
+            let replacement = scaffoldRegexs[j].replacement;
+            //console.log(`Replacing [${match[0]}] with [${replacement}]`);
+            result = result.replace(regex, replacement);
+            match = regex.exec(result);
+        }
+    }
+    return result;
 };
 
 const replaceLists = (content) => {
