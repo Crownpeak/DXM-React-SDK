@@ -79,8 +79,8 @@ const finalProcessMarkup = (content) => {
 
 const replaceScaffolds = (content) => {
     const scaffoldRegexs = [
-        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*(.*?)\\s*else\\s*\\*\\/\\}\\s*(.*?)\\s*\\{\\s*\\/\\*\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "$1"},
-        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*(.*?)\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "$1"}
+        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*else\\s*\\*\\/\\}\\s*((?:.|\\r|\\n)*?)\\s*\\{\\s*\\/\\*\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "$1"},
+        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "$1"}
     ];
     let result = content;
     for (let j = 0, lenJ = scaffoldRegexs.length; j < lenJ; j++) {
