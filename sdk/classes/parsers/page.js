@@ -1,6 +1,8 @@
 const babelParser = require("@babel/parser");
 const fs = require("fs");
 const path = require('path');
+const cssParser = require("./css");
+const utils = require("crownpeak-dxm-sdk-core/lib/crownpeak/utils");
 const extensions = [".js", ".ts"];
 
 let _pageName = "";
@@ -19,6 +21,7 @@ const parse = (content, file) => {
     }
 
     let results = [];
+    let uploads = [];
     let imports = [];
     const bodyParts = ast.program.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
@@ -41,12 +44,14 @@ const parse = (content, file) => {
                 const name = part.declaration.id.name;
                 const result = processCmsPage(content, ast, part.declaration, imports);
                 if (result) {
-                    results.push({name: name, content: finalProcessMarkup(result), wrapper: findWrapperName(part.declaration)});
+                    const processedResult = utils.replaceAssets(file, finalProcessMarkup(result), cssParser);
+                    uploads = uploads.concat(processedResult.uploads);
+                    results.push({name: name, content: processedResult.content, wrapper: findWrapperName(part.declaration)});
                 }
             }
         }
     }
-    return results;
+    return { pages: results, uploads: uploads };
 };
 
 const initialProcessMarkup = (content) => {
