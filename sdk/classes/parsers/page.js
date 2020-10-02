@@ -43,10 +43,10 @@ const parse = (content, file) => {
                 //console.log(`Found class ${part.declaration.id.name} extending CmsComponent`);
                 const name = part.declaration.id.name;
                 const result = processCmsPage(content, ast, part.declaration, imports);
-                if (result) {
-                    const processedResult = utils.replaceAssets(file, finalProcessMarkup(result), cssParser);
+                if (result && result.content) {
+                    const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser);
                     uploads = uploads.concat(processedResult.uploads);
-                    results.push({name: name, content: processedResult.content, wrapper: findWrapperName(part.declaration)});
+                    results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true});
                 }
             }
         }
@@ -93,12 +93,60 @@ const processCmsPage = (content, ast, declaration, imports) => {
     _pageName = declaration.id.name;
     //console.log(`Processing CmsPage ${declaration.id.name}`);
     const bodyParts = declaration.body.body;
+    let result = {};
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
+        if (part.type === "ClassMethod" && part.kind === "constructor") {
+            const temp = processCmsConstructor(content, declaration, part, imports);
+            if (temp.useTmf) result.useTmf = true;
+            result.wrapper = temp.wrapper;
+        }
         if (part.type === "ClassMethod" && part.key.name === "render") {
-            return processCmsPageReturn(content, declaration, part, imports);
+            result.content = processCmsPageReturn(content, declaration, part, imports); 
         }
     }
+    return result;
+};
+
+const processCmsConstructor = (content, page, ctor, imports) => {
+    return { 
+        useTmf: getConstructorAssignedValue(ctor, "cmsUseTmf", false),
+        wrapper: getConstructorAssignedValue(ctor, "cmsWrapper", undefined)
+    };
+};
+
+const getConstructorAssignedValue = (ctor, name, defaultValue) => {
+    const parts = ctor.body.body;
+    for (let i = 0, len = parts.length; i < len; i++) {
+        const part = parts[i];
+        if (part.type === "ExpressionStatement"
+            && part.expression && part.expression.type === "AssignmentExpression"
+            && part.expression.operator === "=") {
+            if (part.expression.left && part.expression.left.type === "Identifier" 
+                && part.expression.left.name === name
+                && part.expression.right) {
+                // Items of the form
+                // name = value;
+                return part.expression.right.value;
+            } else if (part.expression.left && part.expression.left.type === "MemberExpression"
+                && part.expression.left.object && part.expression.left.object.type === "ThisExpression"
+                && part.expression.left.property && part.expression.left.property.name === name
+                && part.expression.right) {
+                // Items of the form
+                // this.name = value;
+                return part.expression.right.value;
+            } else if (part.expression.left && part.expression.left.type === "MemberExpression"
+                && part.expression.left.object && part.expression.left.object.type === "ThisExpression"
+                && part.expression.left.property && part.expression.left.property.type === "StringLiteral"
+                && part.expression.left.property.value === name
+                && part.expression.right) {
+                // Items of the form
+                // this["name"] = value;
+                return part.expression.right.value;
+            }
+        }
+    }
+    return defaultValue;
 };
 
 const processCmsPageReturn = (content, page, render, imports) => {
@@ -168,34 +216,6 @@ const getSource = (source) => {
         if (fs.existsSync(source + ext)) return fs.readFileSync(source + ext);
     }
     return "";
-};
-
-const findWrapperName = (object) => {
-    if (object.type === "ExpressionStatement"
-        && object.expression && object.expression.type === "AssignmentExpression" && object.expression.operator === "="
-        && object.expression.left && object.expression.left.type === "MemberExpression"
-        && object.expression.left.object && object.expression.left.object.type === "ThisExpression"
-        && object.expression.left.property && object.expression.left.property.type === "Identifier"
-        && object.expression.left.property.name === "cmsWrapper"
-        && object.expression.right && object.expression.right.type === "StringLiteral") {
-        // Items of the form
-        // this.cmsWrapper = "MyWrapperName";
-        //console.log(`Found ${variable} with field name ${object.expression.right.arguments[0].value} and type ${object.expression.right.arguments[1].property.name}`);
-        return object.expression.right.value;
-    }
-
-    // Recurse
-    const validFields = ["body","expression","callee","object"];
-    for (let i in validFields) {
-        let sub = object[validFields[i]];
-        if (sub) {
-            if (!sub.length) sub = [sub];
-            for (var j = 0; j < sub.length; j++) {
-                let result = findWrapperName(sub[j]);
-                if (result) return result;
-            }
-        }
-    }
 };
 
 module.exports = {

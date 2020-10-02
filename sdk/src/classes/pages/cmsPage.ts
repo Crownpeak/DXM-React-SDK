@@ -4,6 +4,7 @@ import { ReactNode } from "React";
 
 export default class CmsPage extends CmsCore {
     cmsWrapper?: string;
+    cmsUseTmf: boolean = false;
 
     render(): ReactNode
     {
