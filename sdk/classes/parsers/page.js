@@ -46,7 +46,7 @@ const parse = (content, file) => {
                 if (result && result.content) {
                     const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser);
                     uploads = uploads.concat(processedResult.uploads);
-                    results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true});
+                    results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
                 }
             }
         }
@@ -98,6 +98,8 @@ const processCmsPage = (content, ast, declaration, imports) => {
         const part = bodyParts[i];
         if (part.type === "ClassMethod" && part.kind === "constructor") {
             const temp = processCmsConstructor(content, declaration, part, imports);
+            if (temp.suppressFolder) result.suppressFolder = true;
+            if (temp.suppressModel) result.suppressModel = true;
             if (temp.useTmf) result.useTmf = true;
             result.wrapper = temp.wrapper;
         }
@@ -111,6 +113,8 @@ const processCmsPage = (content, ast, declaration, imports) => {
 const processCmsConstructor = (content, page, ctor, imports) => {
     return { 
         useTmf: getConstructorAssignedValue(ctor, "cmsUseTmf", false),
+        suppressFolder: getConstructorAssignedValue(ctor, "cmsSuppressFolder", false),
+        suppressModel: getConstructorAssignedValue(ctor, "cmsSuppressModel", false),
         wrapper: getConstructorAssignedValue(ctor, "cmsWrapper", undefined)
     };
 };

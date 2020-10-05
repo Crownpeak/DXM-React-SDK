@@ -5,6 +5,8 @@ import { ReactNode } from "React";
 export default class CmsPage extends CmsCore {
     cmsWrapper?: string;
     cmsUseTmf: boolean = false;
+    cmsSuppressFolder: boolean = false;
+    cmsSuppressModel: boolean = false;
 
     render(): ReactNode
     {
