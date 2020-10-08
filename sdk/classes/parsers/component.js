@@ -60,9 +60,9 @@ const parse = (content, file) => {
                 const name = part.declaration.id.name;
                 const result = processCmsComponent(content, ast, part.declaration, imports, dependencies);
                 if (result) {
-                    const processedResult = utils.replaceAssets(file, finalProcessMarkup(result), cssParser, true);
+                    const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser, true);
                     uploads = uploads.concat(processedResult.uploads);
-                    results.push({name: name, content: processedResult.content, dependencies: dependencies});
+                    results.push({name: name, content: processedResult.content, folder: result.folder, dependencies: dependencies});
                 }
             }
         }
@@ -158,12 +158,58 @@ const processCmsComponent = (content, ast, declaration, imports, dependencies) =
     _componentName = declaration.id.name;
     //console.log(`Processing CmsComponent ${declaration.id.name}`);
     const bodyParts = declaration.body.body;
+    let result = {};
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
+        if (part.type === "ClassMethod" && part.kind === "constructor") {
+            const temp = processCmsConstructor(content, declaration, part, imports);
+            if (temp.folder) result.folder = temp.folder;
+        }
         if (part.type === "ClassMethod" && part.key.name === "render") {
-            return processCmsComponentReturn(content, declaration, part, imports, dependencies);
+            result.content = processCmsComponentReturn(content, declaration, part, imports, dependencies);
         }
     }
+    return result;
+};
+
+const processCmsConstructor = (content, page, ctor, imports) => {
+    return { 
+        folder: getConstructorAssignedValue(ctor, "cmsFolder", "")
+    };
+};
+
+const getConstructorAssignedValue = (ctor, name, defaultValue) => {
+    const parts = ctor.body.body;
+    for (let i = 0, len = parts.length; i < len; i++) {
+        const part = parts[i];
+        if (part.type === "ExpressionStatement"
+            && part.expression && part.expression.type === "AssignmentExpression"
+            && part.expression.operator === "=") {
+            if (part.expression.left && part.expression.left.type === "Identifier" 
+                && part.expression.left.name === name
+                && part.expression.right) {
+                // Items of the form
+                // name = value;
+                return part.expression.right.value;
+            } else if (part.expression.left && part.expression.left.type === "MemberExpression"
+                && part.expression.left.object && part.expression.left.object.type === "ThisExpression"
+                && part.expression.left.property && part.expression.left.property.name === name
+                && part.expression.right) {
+                // Items of the form
+                // this.name = value;
+                return part.expression.right.value;
+            } else if (part.expression.left && part.expression.left.type === "MemberExpression"
+                && part.expression.left.object && part.expression.left.object.type === "ThisExpression"
+                && part.expression.left.property && part.expression.left.property.type === "StringLiteral"
+                && part.expression.left.property.value === name
+                && part.expression.right) {
+                // Items of the form
+                // this["name"] = value;
+                return part.expression.right.value;
+            }
+        }
+    }
+    return defaultValue;
 };
 
 const processCmsComponentReturn = (content, component, render, imports, dependencies) => {
