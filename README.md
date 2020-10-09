@@ -73,7 +73,10 @@ export default class BlogPage extends CmsStaticPage
     constructor(props)
     {
         super(props);
-        this.cmsWrapper = ""; //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
+        this.cmsWrapper = "";           //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
+        this.cmsUseTmf = false;         //set to true to create templates that use the Translation Model Framework.
+        this.cmsSuppressModel = false;  //set to true to suppress model and content folder creation when scaffolding.
+        this.cmsSuppressFolder = false; //set to true to suppress content folder creation when scaffolding.
         if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
     }
 
@@ -135,7 +138,10 @@ export default class BlogPage extends CmsDynamicPage
     constructor(props)
     {
         super(props);
-        this.cmsWrapper = ""; //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
+        this.cmsWrapper = "";           //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
+        this.cmsUseTmf = false;         //set to true to create templates that use the Translation Model Framework.
+        this.cmsSuppressModel = false;  //set to true to suppress model and content folder creation when scaffolding.
+        this.cmsSuppressFolder = false; //set to true to suppress content folder creation when scaffolding.
         if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
     }
 
@@ -194,6 +200,7 @@ export default class BlogPost extends CmsComponent
         this.post_date = new CmsField("Post_Date", CmsFieldTypes.DATE);
         this.post_content = new CmsField("Post_Content", CmsFieldTypes.WYSIWYG);
         this.post_category = new CmsField("Post_Category", CmsFieldTypes.DOCUMENT);
+        this.cmsFolder = ""; //set the subfolder in which the component will be created when scaffolding.
     }
 
     render() {
