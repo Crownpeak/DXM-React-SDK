@@ -42,7 +42,7 @@ const parse = (content, file) => {
         }
     }
     // Parse out any special lists
-    content = replaceLists(content);
+    content = replaceLists(content, dependencies);
 
     // Re-parse the content after our changes
     ast = babelParser.parse(content, {
@@ -101,7 +101,7 @@ const replaceScaffolds = (content) => {
     return result;
 };
 
-const replaceLists = (content) => {
+const replaceLists = (content, dependencies) => {
     let match;
     while (match = reList.exec(content)) {
         let attributes = " " + match[2] + " " + match[5];
@@ -125,6 +125,7 @@ const replaceLists = (content) => {
         }
         //console.log(`Found list with name ${name}`);
         const repl = `${ws}<cp-list name="${name}">\r\n${ws}  {new CmsField("${itemName}", "${type}")}\r\n${ws}</cp-list>`;
+        addDependency(type, dependencies);
         content = content.replace(match[0], repl);
     }
     return content;
@@ -406,7 +407,7 @@ const processJsxElement = (content, component, object, replacements, imports, de
     const componentName = object.openingElement.name.name;
     let suffix = "";
     let previouslyUsed = replacements.filter(r => r.component === componentName);
-    if (!previouslyUsed || !previouslyUsed.length) dependencies.push(componentName);
+    addDependency(componentName, dependencies);
     if (previouslyUsed && previouslyUsed.length > 0) suffix = `_${previouslyUsed.length + 1}`;
     replacements.push({start: object.start, end: object.end, component: componentName, value: `{${componentName}${suffix}:${componentName}}`});
 };
@@ -490,6 +491,10 @@ const findCmsFieldFromVariableSub = (content, object, variable) => {
     }
 };
 
+const addDependency = (type, dependencies) => {
+    if (utils.isCoreComponent(type)) return;
+    if (dependencies.indexOf(type) < 0) dependencies.push(type);
+};
 
 const cmsFieldTypeToString = (cmsFieldType) => {
     if (cmsFieldType === "IMAGE") return "Src";
