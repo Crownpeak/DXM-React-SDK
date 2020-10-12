@@ -275,10 +275,10 @@ const processCmsComponentReturn = (content, component, render, imports, dependen
     }
 };
 
-const processCmsComponentPattern = (content, component, object, replacements, imports, dependencies) => {
+const processCmsComponentPattern = (content, component, object, replacements, imports, dependencies, isAttribute = false) => {
     if (!object) return;
     if (object.type === "JSXExpressionContainer") {
-        processJsxExpression(content, component, object, replacements, imports);
+        processJsxExpression(content, component, object, replacements, imports, isAttribute);
     } else if (object.type === "JSXElement" && object.openingElement && object.openingElement.name
         && imports.find(i => object.openingElement.name.name === i)) {
         processJsxElement(content, component, object, replacements, imports, dependencies);
@@ -289,14 +289,16 @@ const processCmsComponentPattern = (content, component, object, replacements, im
     } else if (typeof object !== "string") {
         const keys = Object.keys(object);
         for (let key in keys) {
-            processCmsComponentPattern(content, component, object[keys[key]], replacements, imports, dependencies);
+            processCmsComponentPattern(content, component, object[keys[key]], replacements, imports, dependencies, object.type === "JSXAttribute");
         }
     }
 };
 
-const processJsxExpression = (content, component, object, replacements, imports) => {
+const processJsxExpression = (content, component, object, replacements, imports, isAttribute = false) => {
     let result = processJsxExpressionSub(content, component, object, imports);
     if (result) {
+        // JSX doesn't allow the attribute expression to be quoted, but HTML relies on it
+        const quotes = isAttribute ? "\"" : "";
         if (result.thisproperty) {
             // Find the definition of this field
             result = findCmsFieldFromVariable(content, component, result.thisproperty, result.comment);
@@ -305,10 +307,10 @@ const processJsxExpression = (content, component, object, replacements, imports)
             let indexedField = cmsIndexedFieldToString(result.indexedField);
             if (indexedField) indexedField = ":" + indexedField;
             //console.log(`Replacing ${content.slice(object.start, object.end)} with {${result.cmsfield}:${cmsFieldTypeToString(result.type)}${indexedField}}`);
-            replacements.push({start: object.start, end: object.end, value: `${result.comment ? "<!-- " : ""}{${result.cmsfield}:${cmsFieldTypeToString(result.type)}${indexedField}}${result.comment ? " -->" : ""}`});
+            replacements.push({start: object.start, end: object.end, value: `${result.comment ? "<!-- " : ""}${quotes}{${result.cmsfield}:${cmsFieldTypeToString(result.type)}${indexedField}}${quotes}${result.comment ? " -->" : ""}`});
         } else {
             // Trim first and last character to remove { and }
-            replacements.push({start: object.start, end: object.end, value: content.slice(object.start + 1, object.end - 1)});
+            replacements.push({start: object.start, end: object.end, value: quotes + content.slice(object.start + 1, object.end - 1) + quotes});
         }
     }
 };
