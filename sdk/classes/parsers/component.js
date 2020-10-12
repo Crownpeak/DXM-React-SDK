@@ -11,6 +11,8 @@ const reComponentType4 = /^\s*new\s+CmsField\s*[(]\s*(["'])([a-z0-9_]+)\1\s*,\s*
 const reList = /^([ \t]*){\s*\/\*\s*<List(.*?)\s*type=(["'])([^"']+?)\3(.*?)>\s*\*\/\s*}((.|\s)*?){\s*\/\*\s*\<\/List>\s*\*\/\s*}/im;
 const reListName = /\s+?name\s*=\s*(["'])([^"']+?)\1/i;
 const reListItemName = /\s+?itemName\s*=\s*(["'])([^"']+?)\1/i;
+const reStyle = /\sstyle\s*=\s*(\{+[^}]+\}+)/i;
+const reStyleRule = /([^:\s]+)\s*:\s*(['"]?)([^"',]+)\2/ig;
 
 const parse = (content, file) => {
     let ast = babelParser.parse(content, {
@@ -73,6 +75,8 @@ const parse = (content, file) => {
 const finalProcessMarkup = (content) => {
     // Parse out any cp-scaffolds
     content = replaceScaffolds(content);
+    // Parse out any styles
+    content = replaceStyles(content);
     // Remove anything that has { and } but doesn't look like a component
     const replacer = /[{]([^}]*?[\s,/$()][^}]*?)[}]/g;
     while (replacer.test(content)) {
@@ -129,6 +133,38 @@ const replaceLists = (content, dependencies) => {
         content = content.replace(match[0], repl);
     }
     return content;
+};
+
+const replaceStyles = (content) => {
+    let match = reStyle.exec(content);
+    while (match) {
+        const style = match[1];
+        let replacements = [];
+        //console.log("Found style ${style}");
+        if (style.substr(0, 2) === "{{" && style.slice(-2) === "}}") {
+            let ruleMatch = reStyleRule.exec(style.slice(2, style.length - 2));
+            while (ruleMatch) {
+                replacements.push(`${camelCaseToDashes(ruleMatch[1])}: ${prepareCssValue(ruleMatch[1], ruleMatch[3])}`);
+                ruleMatch = reStyleRule.exec(style.slice(2, style.length - 2));
+            }
+        } else {
+            // TODO: support other JSX style definition formats
+        }
+        content = content.replace(match[0], ` style='${replacements.join("; ")}'`);
+        match = reStyle.exec(content);
+    }
+    return content;
+};
+
+const camelCaseToDashes = (str) => {
+    return str.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
+};
+
+const prepareCssValue = (key, value) => {
+    if (["animationIterationCount","borderImageOutset","borderImageSlice","borderImageWidth","boxFlex","boxFlexGroup","boxOrdinalGroup","columnCount","columns","flex","flexGrow","flexPositive","flexShrink","flexNegative","flexOrder","gridRow","gridRowEnd","gridRowSpan","gridRowStart","gridColumn","gridColumnEnd","gridColumnSpan","gridColumnStart","fontWeight","lineClamp","lineHeight","opacity","order","orphans","tabSize","widows","zIndex","zoom","fillOpacity","floodOpacity","stopOpacity","strokeDasharray","strokeDashoffset","strokeMiterlimit","strokeOpacity","strokeWidth"]
+        .indexOf(key) < 0
+        && (/^[0-9]+$/.test(value))) return value + "px";
+    return value;
 };
 
 const trimSharedLeadingWhitespace = (content) => {

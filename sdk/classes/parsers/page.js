@@ -4,6 +4,8 @@ const path = require('path');
 const cssParser = require("./css");
 const utils = require("crownpeak-dxm-sdk-core/lib/crownpeak/utils");
 const extensions = [".js", ".ts"];
+const reStyle = /\sstyle\s*=\s*(\{+[^}]+\}+)/i;
+const reStyleRule = /([^:\s]+)\s*:\s*(['"]?)([^"',]+)\2/ig;
 
 let _pageName = "";
 let _fileName = "";
@@ -61,8 +63,42 @@ const initialProcessMarkup = (content) => {
 };
 
 const finalProcessMarkup = (content) => {
+    // Parse out any styles
+    content = replaceStyles(content);
     content = content.replace(/className/ig, "class");
     return trimSharedLeadingWhitespace(content);
+};
+
+const replaceStyles = (content) => {
+    let match = reStyle.exec(content);
+    while (match) {
+        const style = match[1];
+        let replacements = [];
+        //console.log("Found style ${style}");
+        if (style.substr(0, 2) === "{{" && style.slice(-2) === "}}") {
+            let ruleMatch = reStyleRule.exec(style.slice(2, style.length - 2));
+            while (ruleMatch) {
+                replacements.push(`${camelCaseToDashes(ruleMatch[1])}: ${prepareCssValue(ruleMatch[1], ruleMatch[3])}`);
+                ruleMatch = reStyleRule.exec(style.slice(2, style.length - 2));
+            }
+        } else {
+            // TODO: support other JSX style definition formats
+        }
+        content = content.replace(match[0], ` style='${replacements.join("; ")}'`);
+        match = reStyle.exec(content);
+    }
+    return content;
+};
+
+const camelCaseToDashes = (str) => {
+    return str.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
+};
+
+const prepareCssValue = (key, value) => {
+    if (["animationIterationCount","borderImageOutset","borderImageSlice","borderImageWidth","boxFlex","boxFlexGroup","boxOrdinalGroup","columnCount","columns","flex","flexGrow","flexPositive","flexShrink","flexNegative","flexOrder","gridRow","gridRowEnd","gridRowSpan","gridRowStart","gridColumn","gridColumnEnd","gridColumnSpan","gridColumnStart","fontWeight","lineClamp","lineHeight","opacity","order","orphans","tabSize","widows","zIndex","zoom","fillOpacity","floodOpacity","stopOpacity","strokeDasharray","strokeDashoffset","strokeMiterlimit","strokeOpacity","strokeWidth"]
+        .indexOf(key) < 0
+        && (/^[0-9]+$/.test(value))) return value + "px";
+    return value;
 };
 
 const trimSharedLeadingWhitespace = (content) => {
