@@ -201,6 +201,7 @@ export default class BlogPost extends CmsComponent
         this.post_content = new CmsField("Post_Content", CmsFieldTypes.WYSIWYG);
         this.post_category = new CmsField("Post_Category", CmsFieldTypes.DOCUMENT);
         this.cmsFolder = ""; //set the subfolder in which the component will be created when scaffolding.
+        this.cmsZones = []; //set the zones into which the component is permitted to be dropped.
     }
 
     render() {

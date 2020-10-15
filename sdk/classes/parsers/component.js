@@ -64,7 +64,7 @@ const parse = (content, file) => {
                 if (result) {
                     const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser, true);
                     uploads = uploads.concat(processedResult.uploads);
-                    results.push({name: name, content: processedResult.content, folder: result.folder, dependencies: dependencies});
+                    results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, dependencies: dependencies});
                 }
             }
         }
@@ -201,6 +201,7 @@ const processCmsComponent = (content, ast, declaration, imports, dependencies) =
         if (part.type === "ClassMethod" && part.kind === "constructor") {
             const temp = processCmsConstructor(content, declaration, part, imports);
             if (temp.folder) result.folder = temp.folder;
+            if (temp.zones) result.zones = typeof(temp.zones) === "string" ? temp.zones.split(",") : temp.zones;
         }
         if (part.type === "ClassMethod" && part.key.name === "render") {
             result.content = processCmsComponentReturn(content, declaration, part, imports, dependencies);
@@ -211,7 +212,8 @@ const processCmsComponent = (content, ast, declaration, imports, dependencies) =
 
 const processCmsConstructor = (content, page, ctor, imports) => {
     return { 
-        folder: getConstructorAssignedValue(ctor, "cmsFolder", "")
+        folder: getConstructorAssignedValue(ctor, "cmsFolder", ""),
+        zones: getConstructorAssignedValue(ctor, "cmsZones", "")
     };
 };
 
@@ -225,24 +227,42 @@ const getConstructorAssignedValue = (ctor, name, defaultValue) => {
             if (part.expression.left && part.expression.left.type === "Identifier" 
                 && part.expression.left.name === name
                 && part.expression.right) {
-                // Items of the form
-                // name = value;
-                return part.expression.right.value;
+                if (part.expression.right.type === "ArrayExpression") {
+                    // Items of the form
+                    // name = [value];
+                    return part.expression.right.elements.map(e => e.value);
+                } else {
+                    // Items of the form
+                    // name = value;
+                    return part.expression.right.value;
+                }
             } else if (part.expression.left && part.expression.left.type === "MemberExpression"
                 && part.expression.left.object && part.expression.left.object.type === "ThisExpression"
                 && part.expression.left.property && part.expression.left.property.name === name
                 && part.expression.right) {
-                // Items of the form
-                // this.name = value;
-                return part.expression.right.value;
+                if (part.expression.right.type === "ArrayExpression") {
+                    // Items of the form
+                    // this.name = [value];
+                    return part.expression.right.elements.map(e => e.value);
+                } else {
+                    // Items of the form
+                    // this.name = value;
+                    return part.expression.right.value;
+                }
             } else if (part.expression.left && part.expression.left.type === "MemberExpression"
                 && part.expression.left.object && part.expression.left.object.type === "ThisExpression"
                 && part.expression.left.property && part.expression.left.property.type === "StringLiteral"
                 && part.expression.left.property.value === name
                 && part.expression.right) {
-                // Items of the form
-                // this["name"] = value;
-                return part.expression.right.value;
+                if (part.expression.right.type === "ArrayExpression") {
+                    // Items of the form
+                    // this["name"] = [value];
+                    return part.expression.right.elements.map(e => e.value);
+                } else {
+                    // Items of the form
+                    // this["name"] = value;
+                    return part.expression.right.value;
+                }
             }
         }
     }
