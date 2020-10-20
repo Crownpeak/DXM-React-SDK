@@ -46,6 +46,9 @@ const parse = (content, file) => {
     // Parse out any special lists
     content = replaceLists(content, dependencies);
 
+    // Parse out any cp-scaffolds
+    content = replacePreScaffolds(content);
+
     // Re-parse the content after our changes
     ast = babelParser.parse(content, {
         sourceType: "module",
@@ -74,7 +77,7 @@ const parse = (content, file) => {
 
 const finalProcessMarkup = (content) => {
     // Parse out any cp-scaffolds
-    content = replaceScaffolds(content);
+    content = replacePostScaffolds(content);
     // Parse out any styles
     content = replaceStyles(content);
     // Remove anything that has { and } but doesn't look like a component
@@ -86,10 +89,28 @@ const finalProcessMarkup = (content) => {
     return trimSharedLeadingWhitespace(content);
 };
 
-const replaceScaffolds = (content) => {
+const replacePreScaffolds = (content) => {
     const scaffoldRegexs = [
-        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*else\\s*\\*\\/\\}\\s*((?:.|\\r|\\n)*?)\\s*\\{\\s*\\/\\*\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "$1"},
-        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "$1"}
+        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*else\\s*\\*\\/\\}\\s*((?:.|\\r|\\n)*?)\\s*\\{\\s*\\/\\*\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "{/* cp-pre-scaffold $1 /cp-pre-scaffold */}"},
+        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "{/* cp-pre-scaffold $1 /cp-pre-scaffold */}"}
+    ];
+    let result = content;
+    for (let j = 0, lenJ = scaffoldRegexs.length; j < lenJ; j++) {
+        let regex = new RegExp(scaffoldRegexs[j].source);
+        let match = regex.exec(result);
+        while (match) {
+            let replacement = scaffoldRegexs[j].replacement;
+            //console.log(`Replacing [${match[0]}] with [${replacement}]`);
+            result = result.replace(regex, replacement);
+            match = regex.exec(result);
+        }
+    }
+    return result;
+};
+
+const replacePostScaffolds = (content) => {
+    const scaffoldRegexs = [
+        { source: "\\{\\s*\\/\\*\\s*cp-pre-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-pre-scaffold\\s*\\*\\/\\}", replacement: "$1"}
     ];
     let result = content;
     for (let j = 0, lenJ = scaffoldRegexs.length; j < lenJ; j++) {
