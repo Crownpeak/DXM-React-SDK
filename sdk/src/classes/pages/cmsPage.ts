@@ -7,10 +7,13 @@ export default class CmsPage extends CmsCore {
     cmsUseTmf: boolean = false;
     cmsSuppressFolder: boolean = false;
     cmsSuppressModel: boolean = false;
+    state = { isLoaded: false };
 
     render(): ReactNode
     {
-        this.cmsDataProvider.getSingleAsset(this.cmsAssetId);
+        if (this.state.isLoaded) return null;
+        const that = this;
+        this.cmsDataProvider.getSingleAsset(this.cmsAssetId).then(() => that.setState({ isLoaded: true }));
         CmsDataCache.cmsAssetId = this.cmsAssetId;
         return null;
     }

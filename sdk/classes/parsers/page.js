@@ -12,6 +12,9 @@ let _fileName = "";
 
 const parse = (content, file) => {
     _fileName = file;
+
+    content = initialProcessMarkup(content);
+
     const ast = babelParser.parse(content, {
         sourceType: "module",
         plugins: ["jsx"]
@@ -57,9 +60,12 @@ const parse = (content, file) => {
 };
 
 const initialProcessMarkup = (content) => {
+    // Remove the check for isLoaded before rendering
+    content = content.replace(/(return\s*\()\s*this.state.isLoaded\s+&&(\s*)/ig, "$1$2");
     // TODO: find a way to run this without breaking the ability to make replacements
     // Remove any { and }
-    return content.replace(/[{]|[}]/g, "");
+    // content = content.replace(/[{]|[}]/g, "");
+    return content;
 };
 
 const finalProcessMarkup = (content) => {

@@ -148,6 +148,7 @@ export default class BlogPage extends CmsDynamicPage
     render() {
         super.render();
         return (
+            this.state.isLoaded &&
             <div>
                 <div className="container">
                     <Header month={this.props.match.params.month}/>
