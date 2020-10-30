@@ -319,7 +319,7 @@ const processCmsComponentReturn = (content, component, render, imports, dependen
 const processCmsComponentPattern = (content, component, object, replacements, imports, dependencies, isAttribute = false) => {
     if (!object) return;
     if (object.type === "JSXExpressionContainer") {
-        processJsxExpression(content, component, object, replacements, imports, isAttribute);
+        processJsxExpression(content, component, object, replacements, imports, dependencies, isAttribute);
     } else if (object.type === "JSXElement" && object.openingElement && object.openingElement.name
         && imports.find(i => object.openingElement.name.name === i)) {
         processJsxElement(content, component, object, replacements, imports, dependencies);
@@ -335,7 +335,7 @@ const processCmsComponentPattern = (content, component, object, replacements, im
     }
 };
 
-const processJsxExpression = (content, component, object, replacements, imports, isAttribute = false) => {
+const processJsxExpression = (content, component, object, replacements, imports, dependencies, isAttribute = false) => {
     let result = processJsxExpressionSub(content, component, object, imports);
     if (result) {
         // JSX doesn't allow the attribute expression to be quoted, but HTML relies on it
@@ -348,6 +348,7 @@ const processJsxExpression = (content, component, object, replacements, imports,
             let indexedField = cmsIndexedFieldToString(result.indexedField);
             if (indexedField) indexedField = ":" + indexedField;
             //console.log(`Replacing ${content.slice(object.start, object.end)} with {${result.cmsfield}:${cmsFieldTypeToString(result.type)}${indexedField}}`);
+            addDependency(cmsFieldTypeToString(result.type), dependencies);
             replacements.push({start: object.start, end: object.end, value: `${result.comment ? "<!-- " : ""}${quotes}{${result.cmsfield}:${cmsFieldTypeToString(result.type)}${indexedField}}${quotes}${result.comment ? " -->" : ""}`});
         } else {
             // Trim first and last character to remove { and }
