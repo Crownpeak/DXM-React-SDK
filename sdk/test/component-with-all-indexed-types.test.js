@@ -6,7 +6,6 @@ const path = require('path');
 const file = path.resolve('./test/fixtures/component-with-all-indexed-types.js');
 const content = fs.readFileSync(file, 'utf8');
 const { components, uploads } = parser.parse(content, file);
-console.log(`DEBUG: ${components[0].content}`)
 
 describe('Component With All Indexed Types', () => {
     it('should find no uploads', () => {

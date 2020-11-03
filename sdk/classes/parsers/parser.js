@@ -1,10 +1,14 @@
 const fs = require("fs");
 const componentParser = require("./component");
+const functionComponentParser = require("./functionComponent");
 const pageParser = require("./page");
+const functionPageParser = require("./functionPage");
 const wrapperParser = require("./wrapper");
 
 const reComponent = new RegExp("class .*? extends CmsComponent");
+const reFunctionComponent = new RegExp("CmsDataCache.setComponent\\s*\\(");
 const rePage = new RegExp("class .*? extends Cms(Dynamic|Static)Page");
+const reFunctionPage = new RegExp("Cms(Dynam|Stat)icPage.load(?:Sync)?\\s*\\(");
 const reWrapper = new RegExp("data-cms-wrapper-name=");
 
 const process = (file) => {
@@ -22,9 +26,21 @@ const process = (file) => {
         components = temp.components;
         uploads = temp.uploads;
     }
+    else if (reFunctionComponent.test(content)) {
+        //console.log(`Found component in ${file}`);
+        const temp = functionComponentParser.parse(content, file);
+        components = temp.components;
+        uploads = temp.uploads;
+    }
     if (rePage.test(content)) {
         //console.log(`Found page in ${file}`)
         const temp = pageParser.parse(content, file);
+        pages = temp.pages;
+        uploads = temp.uploads;
+    }
+    else if (reFunctionPage.test(content)) {
+        //console.log(`Found page in ${file}`)
+        const temp = functionPageParser.parse(content, file);
         pages = temp.pages;
         uploads = temp.uploads;
     }

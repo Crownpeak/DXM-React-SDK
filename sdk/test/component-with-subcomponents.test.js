@@ -6,7 +6,6 @@ const path = require('path');
 const file = path.resolve('./test/fixtures/component-with-subcomponents.js');
 const content = fs.readFileSync(file, 'utf8');
 const { components, uploads } = parser.parse(content, file);
-console.log(JSON.stringify(components[0]))
 
 describe('Component With Subcomponents', () => {
     it('should find no uploads', () => {

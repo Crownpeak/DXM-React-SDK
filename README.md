@@ -185,6 +185,30 @@ export default class BlogPage extends CmsDynamicPage
 }
 ```
 
+If you are using React function components, you must call out to a load() method on the page type for your page to be recognised and scaffolded correctly.
+
+```
+import React, { useState, useEffect } from 'react';
+import { CmsStaticPage } from 'crownpeak-dxm-react-sdk';
+// [ ... ]
+
+export default function BlogPage()
+{
+    let isLoaded = CmsStaticPage.load(12345, useState, useEffect); // Or use CmsDynamicPage
+    const cmsWrapper = "";           //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
+    const cmsUseTmf = false;         //set to true to create templates that use the Translation Model Framework.
+    const cmsSuppressModel = false;  //set to true to suppress model and content folder creation when scaffolding.
+    const cmsSuppressFolder = false; //set to true to suppress content folder creation when scaffolding.
+
+    return (
+        isLoaded && 
+        <div>
+            <!-- [...] -->
+        </div>
+    )
+}
+```
+
 ### CmsComponent
 Includes CmsField references for content rendering from DXM within a React Component.:
 ```
@@ -215,6 +239,31 @@ export default class BlogPost extends CmsComponent
             </div>
         )
     }
+}
+```
+
+If you are using React function components, you must call out to the CmsDataCache.setComponent() method for your component to be recognised and scaffolded correctly.
+
+```
+import React from 'react';
+import { CmsField, CmsFieldTypes, CmsDataCache } from 'crownpeak-dxm-react-sdk';
+import ReactHtmlParser from 'react-html-parser';
+
+export default function BlogPost(props)
+{
+    CmsDataCache.setComponent("BlogPost");
+    const cmsFolder = ""; //set the subfolder in which the component will be created when scaffolding.
+    const cmsZones = []; //set the zones into which the component is permitted to be dropped.
+
+    var heading = new CmsField("Heading", CmsFieldTypes.TEXT);
+    var description = new CmsField("Description", CmsFieldTypes.WYSIWYG);
+
+    return (
+        <div className="container">
+            <h1>{ heading }</h1>
+            { ReactHtmlParser(description) }
+        </div>
+    )
 }
 ```
 
