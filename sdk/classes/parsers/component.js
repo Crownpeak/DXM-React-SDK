@@ -17,7 +17,7 @@ const reStyleRule = /([^:\s]+)\s*:\s*(['"]?)([^"',]+)\2/ig;
 const parse = (content, file) => {
     let ast = babelParser.parse(content, {
         sourceType: "module",
-        plugins: ["jsx", "classProperties"]
+        plugins: ["jsx", "classProperties", "typescript"]
     });
     //console.log(JSON.stringify(ast));
     if (ast.errors && ast.errors.length > 0) {
@@ -52,7 +52,7 @@ const parse = (content, file) => {
     // Re-parse the content after our changes
     ast = babelParser.parse(content, {
         sourceType: "module",
-        plugins: ["jsx", "classProperties"]
+        plugins: ["jsx", "classProperties", "typescript"]
     });
     bodyParts = ast.program.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {

@@ -33,7 +33,7 @@ const processCommand = (options) => {
             wrappers.push(result.wrapper);
         }
     }
-    const jsfiles = files.getRecursive(cwd, "js");
+    const jsfiles = files.getRecursive(cwd, ["js","tsx"]);
     for (let f in jsfiles) {
         //console.log(`Processing ${jsfiles[f]}`);
         let result = parser.process(jsfiles[f]);
