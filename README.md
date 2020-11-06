@@ -4,6 +4,16 @@
 Crownpeak Digital Experience Management (DXM) Software Development Kit (SDK) for React has been constructed to assist
 the Single Page App developer in developing client-side applications that leverage DXM for content management purposes.
 
+---
+## Upgrading
+* If you're upgrading from a version before 2.1.0, please run the following before installing the new patch.
+    ```
+    yarn crownpeak upgrade
+    # or 
+    npx crownpeak upgrade
+    ```
+* If you're upgrading to version 3.0.0 or higher, please note the change to asynchronous data loading, and include a check for `this.state.isLoaded` in your `render()` method. See the examples below.
+---
 
 ## Benefits
 * **Runtime libraries to handle communication with either Dynamic (DXM Dynamic Content API) or Static (On-disk JSON payload)
@@ -83,6 +93,7 @@ export default class BlogPage extends CmsStaticPage
     render() {
         super.render();
         return (
+            this.state.isLoaded &&
             <div>
                 <div className="container">
                     <Header month={this.props.match.params.month}/>
@@ -531,6 +542,7 @@ The `crownpeak scaffold` script supports a number of optional command-line param
 | `--no-uploads`    | Do not import any uploads; for example CSS, JavaScript or images. |
 | `--no-wrappers`   | Do not import any wrappers. |
 | `--only <name>`   | Only import items matching the specified name. Can be used multiple times. |
+| `--ignore <name>` | Ignore a single unmet dependency with the specified name. Can be used multiple times. |
 
 These are intended to improve performance for multiple runs, and you should expect to see errors if the items being skipped have not already been created within the CMS; for example, if you provide the `--no--components` parameter where the components have not previously been imported.
 
