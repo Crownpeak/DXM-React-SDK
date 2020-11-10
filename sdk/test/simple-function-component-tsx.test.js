@@ -6,7 +6,6 @@ const path = require('path');
 const file = path.resolve('./test/fixtures/simple-function-component-tsx.tsx');
 const content = fs.readFileSync(file, 'utf8');
 const { components, uploads } = parser.parse(content, file);
-console.log(`DEBUG: ${JSON.stringify(components)}`)
 
 describe('Simple Function Component in TSX', () => {
     it('should not find any uploads', () => {
