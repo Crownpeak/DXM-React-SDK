@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require('path');
 const cssParser = require("./css");
 const utils = require("crownpeak-dxm-sdk-core/lib/crownpeak/utils");
-const extensions = [".js", ".ts"];
+const extensions = [".js", ".ts", ".tsx"];
 const reStyle = /\sstyle\s*=\s*(\{+[^}]+\}+)/i;
 const reStyleRule = /([^:\s]+)\s*:\s*(['"]?)([^"',]+)\2/ig;
 
