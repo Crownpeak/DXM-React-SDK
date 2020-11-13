@@ -60,3 +60,4 @@ Data Sources**
 | 2.3.0         | 2020OCT01     | Preserve paths for uploads, support uploads from pages and wrappers. Bug fixes. |
 | 2.4.0         | 2020OCT09     | Improved uploading and relinking, new page and component creation settings, new --only option. Bug fixes. |
 | 3.0.0         | 2020NOV06     | Change to asynchronous data loading, drag and drop zone governance, function components, TSX. Bug fixes. |
+| 3.0.1         | 2020NOV13     | Bug fixes for TypeScript and TSX files. |
