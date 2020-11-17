@@ -87,8 +87,21 @@ const initialProcessMarkup = (content) => {
 const finalProcessMarkup = (content) => {
     // Parse out any styles
     content = replaceStyles(content);
+    // Remove any React-style comments
+    content = removeComments(content);
     content = content.replace(/className/ig, "class");
     return trimSharedLeadingWhitespace(content);
+};
+
+const removeComments = (content) => {
+    const commentRegexs = [
+        /([ \t]*)\{\s*\/\*(.|\s)*?\*\/\s*\}([ \t]*)\r?\n/ig,
+        /\{\s*\/\*(.|\s)*?\*\/\s*\}/ig
+    ];
+    for (let i = 0, len = commentRegexs.length; i < len; i++) {
+        content = content.replace(commentRegexs[i], "");
+    }
+    return content;
 };
 
 const replaceStyles = (content) => {

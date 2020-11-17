@@ -80,6 +80,8 @@ const finalProcessMarkup = (content) => {
     content = replacePostScaffolds(content);
     // Parse out any styles
     content = replaceStyles(content);
+    // Remove any React-style comments
+    content = removeComments(content);
     // Remove anything that has { and } but doesn't look like a component
     const replacer = /[{]([^}]*?[\s,/$()][^}]*?)[}]/g;
     while (replacer.test(content)) {
@@ -106,6 +108,17 @@ const replacePreScaffolds = (content) => {
         }
     }
     return result;
+};
+
+const removeComments = (content) => {
+    const commentRegexs = [
+        /([ \t]*)\{\s*\/\*(.|\s)*?\*\/\s*\}([ \t]*)\r?\n/ig,
+        /\{\s*\/\*(.|\s)*?\*\/\s*\}/ig
+    ];
+    for (let i = 0, len = commentRegexs.length; i < len; i++) {
+        content = content.replace(commentRegexs[i], "");
+    }
+    return content;
 };
 
 const replacePostScaffolds = (content) => {

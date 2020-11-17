@@ -143,6 +143,8 @@ const finalProcessMarkup = (content) => {
     content = replacePostScaffolds(content);
     // Parse out any styles
     content = replaceStyles(content);
+    // Remove any React-style comments
+    content = removeComments(content);
     // Remove anything that has { and } but doesn't look like a component
     const replacer = /[{]([^}]*?[\s,/$()][^}]*?)[}]/g;
     while (replacer.test(content)) {
@@ -169,6 +171,17 @@ const replacePreScaffolds = (content) => {
         }
     }
     return result;
+};
+
+const removeComments = (content) => {
+    const commentRegexs = [
+        /([ \t]*)\{\s*\/\*(.|\s)*?\*\/\s*\}([ \t]*)\r?\n/ig,
+        /\{\s*\/\*(.|\s)*?\*\/\s*\}/ig
+    ];
+    for (let i = 0, len = commentRegexs.length; i < len; i++) {
+        content = content.replace(commentRegexs[i], "");
+    }
+    return content;
 };
 
 const replacePostScaffolds = (content) => {
@@ -330,7 +343,6 @@ const processCmsComponentReturn = (content, component, part, imports, dependenci
         //console.log(`Found JSX pattern ${content.slice(part.argument.start, part.argument.end)}`);
         let replacements = [];
         processCmsComponentPattern(content, component, part, replacements, imports, dependencies);
-
         // Replace the items in the pattern
         // Go from last to first, so we don't change the index numbers
         let pattern = content.slice(part.argument.start, part.argument.end);
@@ -393,7 +405,9 @@ const processJsxExpressionSub = (content, component, object, imports) => {
         // Items of the form
         // { field_name }
         //console.log(`Found ${object.name}`);
-        return { thisproperty: object.name };
+        if (new RegExp(`(?:const|let|var)\\s+${object.name}\\b`).exec(content))
+            return { thisproperty: object.name };
+        return null;
     }
     else if (object.type === "NewExpression"
         && object.callee && object.callee.type == "Identifier" && object.callee.name === "CmsField"
@@ -443,7 +457,9 @@ const processJsxExpressionSub = (content, component, object, imports) => {
             // Items of the form
             // { /*field_name*/ }
             //console.log(`Found /* ${match[1]} */`);
-            return { thisproperty: match[1], comment: true };
+            if (new RegExp(`(?:const|let|var)\\s+${match[1]}\\b`).exec(content))
+                return { thisproperty: match[1], comment: true };
+            return null;
         }
         match = reComponentType2.exec(object.innerComments[0].value);
         if (match) {
