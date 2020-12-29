@@ -1,6 +1,7 @@
 const babelParser = require("@babel/parser");
 const cssParser = require("./css");
 const utils = require("crownpeak-dxm-sdk-core/lib/crownpeak/utils");
+const extensions = [".js", ".ts", ".jsx", ".tsx"];
 
 let _componentName = "";
 
