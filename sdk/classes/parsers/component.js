@@ -1,9 +1,12 @@
 const babelParser = require("@babel/parser");
+const fs = require("fs");
+const path = require('path');
 const cssParser = require("./css");
 const utils = require("crownpeak-dxm-sdk-core/lib/crownpeak/utils");
 const extensions = [".js", ".ts", ".jsx", ".tsx"];
 
 let _componentName = "";
+let _fileName = "";
 
 const reComponentType1 = /^\s*this.([a-z0-9_]+)\s*$/i;
 const reComponentType2 = /^\s*this\s*\[\s*(["'])([a-z0-9_]+)\s*\1\s*\]\s*$/i;
@@ -16,6 +19,8 @@ const reStyle = /\sstyle\s*=\s*(\{+[^}]+\}+)/i;
 const reStyleRule = /([^:\s]+)\s*:\s*(['"]?)([^"',]+)\2/ig;
 
 const parse = (content, file) => {
+    _fileName = file;
+
     let ast = babelParser.parse(content, {
         sourceType: "module",
         plugins: ["jsx", "classProperties", "typescript"]
@@ -38,8 +43,10 @@ const parse = (content, file) => {
                 const specifier = part.specifiers[i];
                 if ((specifier.type === "ImportDefaultSpecifier" || specifier.type === "ImportSpecifier")
                     && specifier.local && specifier.local.type === "Identifier") {
-                    //console.log(`Found import ${specifier.local.name}`);
-                    imports.push(specifier.local.name);
+                    const imp = {name: specifier.local.name, source: part.source.value};
+                    imp.isCmsComponent = isCmsComponent(imp.name, imp);
+                    //console.log(`Found import ${imp.name}, ${imp.source}, ${imp.isCmsComponent}`);
+                    imports.push(imp);
                 }
             }
         }
@@ -77,6 +84,7 @@ const parse = (content, file) => {
 };
 
 const finalProcessMarkup = (content) => {
+    if (!content || !content.replace) return content;
     // Parse out any cp-scaffolds
     content = replacePostScaffolds(content);
     // Parse out any styles
@@ -346,8 +354,13 @@ const processCmsComponentPattern = (content, component, object, replacements, im
     if (object.type === "JSXExpressionContainer") {
         processJsxExpression(content, component, object, replacements, imports, dependencies, isAttribute);
     } else if (object.type === "JSXElement" && object.openingElement && object.openingElement.name
-        && imports.find(i => object.openingElement.name.name === i)) {
+        && imports.find(i => object.openingElement.name.name === i.name)) {
         processJsxElement(content, component, object, replacements, imports, dependencies);
+        if (object.children && object.children.length) {
+            for (let c of object.children) {
+                processCmsComponentPattern(content, component, c, replacements, imports, dependencies, isAttribute);
+            }
+        }
     } else if (typeof object !== "string" && Array.isArray(object)) {
         for (let i = 0, len = object.length; i < len; i++) {
             processCmsComponentPattern(content, component, object[i], replacements, imports, dependencies);
@@ -508,13 +521,22 @@ const processJsxExpressionSub = (content, component, object, imports) => {
 
 const processJsxElement = (content, component, object, replacements, imports, dependencies) => {
     if (!object || !object.openingElement || !object.openingElement.name
-        || !imports.find(i => object.openingElement.name.name === i)) return;
+        || !imports.find(i => object.openingElement.name.name === i.name)) return;
     const componentName = object.openingElement.name.name;
     let suffix = "";
     let previouslyUsed = replacements.filter(r => r.component === componentName);
     addDependency(componentName, dependencies);
     if (previouslyUsed && previouslyUsed.length > 0) suffix = `_${previouslyUsed.length + 1}`;
-    replacements.push({start: object.start, end: object.end, component: componentName, value: `{${componentName}${suffix}:${componentName}}`});
+    const imp = imports.find(i => object.openingElement.name.name === i.name);
+    if (imp.isCmsComponent) {
+        addDependency(componentName, dependencies);
+        replacements.push({start: object.start, end: object.end, component: componentName, value: `{${componentName}${suffix}:${componentName}}`});
+    }
+    if (object.children && object.children.length) {
+        for (let c of object.children) {
+            if (c.type === "JSXElement") processJsxElement(content, component, c, replacements, imports, dependencies);
+        }
+    }
 };
 
 const findCmsFieldFromVariable = (content, component, variable, comment) => {
@@ -599,6 +621,24 @@ const findCmsFieldFromVariableSub = (content, object, variable) => {
 const addDependency = (type, dependencies) => {
     if (utils.isCoreComponent(type)) return;
     if (dependencies.indexOf(type) < 0) dependencies.push(type);
+};
+
+const isCmsComponent = (componentName, importDefinition) => {
+    //console.log(`Checking ${componentName} (${JSON.stringify(importDefinition)}) for being a CmsComponent`);
+    if (!importDefinition || !importDefinition.source) return false;
+    const content = getSource(importDefinition.source);
+    return content.indexOf(`extends CmsComponent`) > -1 || content.indexOf(`CmsDataCache.setComponent`) > -1;
+}
+
+const getSource = (source) => {
+    source = path.resolve(path.dirname(_fileName), source);
+    if (fs.existsSync(source)) return fs.readFileSync(source);
+
+    for (let i in extensions) {
+        const ext = extensions[i];
+        if (fs.existsSync(source + ext)) return fs.readFileSync(source + ext);
+    }
+    return "";
 };
 
 const cmsFieldTypeToString = (cmsFieldType) => {

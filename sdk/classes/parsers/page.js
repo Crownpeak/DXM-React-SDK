@@ -36,8 +36,10 @@ const parse = (content, file) => {
                 const specifier = part.specifiers[i];
                 if ((specifier.type === "ImportDefaultSpecifier" || specifier.type === "ImportSpecifier")
                     && specifier.local && specifier.local.type === "Identifier") {
-                    //console.log(`Found import ${specifier.local.name}, ${part.source.value}`);
-                    imports.push({name: specifier.local.name, source: part.source.value});
+                    const imp = {name: specifier.local.name, source: part.source.value};
+                    imp.isCmsComponent = isCmsComponent(imp.name, imp);
+                    //console.log(`Found import ${imp.name}, ${imp.source}, ${imp.isCmsComponent}`);
+                    imports.push(imp);
                 }
             }
         }
@@ -320,8 +322,17 @@ const processJsxElement = (content, component, object, replacements, importDefin
     let previouslyUsed = replacements.filter(r => r.component === componentName);
     if (previouslyUsed && previouslyUsed.length > 0) prefix = `${componentName}_${previouslyUsed.length + 1}:`;
     if (isDropZoneComponent(componentName, importDefinition)) return; // DropZones are processed by TemplateBuilder
-    replacements.push({start: object.start, end: object.end, component: componentName, value: `{${prefix}${componentName}}`});
+    if (importDefinition && importDefinition.isCmsComponent) {
+        replacements.push({start: object.start, end: object.end, component: componentName, value: `{${prefix}${componentName}}`});
+    }
 };
+
+const isCmsComponent = (componentName, importDefinition) => {
+    //console.log(`Checking ${componentName} (${JSON.stringify(importDefinition)}) for being a CmsComponent`);
+    if (!importDefinition || !importDefinition.source) return false;
+    const content = getSource(importDefinition.source);
+    return content.indexOf(`extends CmsComponent`) > -1 || content.indexOf(`CmsDataCache.setComponent`) > -1;
+}
 
 const isDropZoneComponent = (componentName, importDefinition) => {
     //console.log(`Checking ${componentName} (${JSON.stringify(importDefinition)}) for extending CmsDropZoneComponent`);
