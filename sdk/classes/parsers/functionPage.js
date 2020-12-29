@@ -3,7 +3,6 @@ const fs = require("fs");
 const path = require('path');
 const cssParser = require("./css");
 const utils = require("crownpeak-dxm-sdk-core/lib/crownpeak/utils");
-const extensions = [".js", ".ts"];
 const extensions = [".js", ".ts", ".jsx", ".tsx"];
 const reStyle = /\sstyle\s*=\s*(\{+[^}]+\}+)/i;
 const reStyleRule = /([^:\s]+)\s*:\s*(['"]?)([^"',]+)\2/ig;
@@ -16,7 +15,7 @@ const parse = (content, file) => {
 
     content = initialProcessMarkup(content);
 
-    const ast = babelParser.parse(content, {
+    let ast = babelParser.parse(content, {
         sourceType: "module",
         plugins: ["jsx"]
     });
@@ -29,7 +28,7 @@ const parse = (content, file) => {
     let results = [];
     let uploads = [];
     let imports = [];
-    const bodyParts = ast.program.body;
+    let bodyParts = ast.program.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
         if (part.type === "ImportDeclaration" && part.specifiers && part.specifiers.length > 0) {
@@ -42,7 +41,20 @@ const parse = (content, file) => {
                 }
             }
         }
-        else if (part.type === "ExportDefaultDeclaration" || part.type === "ExportNamedDeclaration") {
+    }
+
+    // Parse out any cp-scaffolds
+    content = replacePreScaffolds(content);
+
+    // Re-parse the content after our changes
+    ast = babelParser.parse(content, {
+        sourceType: "module",
+        plugins: ["jsx", "typescript"]
+    });
+    bodyParts = ast.program.body;
+    for (let i = 0, len = bodyParts.length; i < len; i++) {
+        const part = bodyParts[i];
+        if (part.type === "ExportDefaultDeclaration" || part.type === "ExportNamedDeclaration") {
             if (part.declaration.type === "FunctionDeclaration"
                 && part.declaration.body.body.some(p => p.type === "VariableDeclaration"
                     && p.declarations.some(d => d.init.type === "CallExpression"
@@ -86,6 +98,9 @@ const initialProcessMarkup = (content) => {
 };
 
 const finalProcessMarkup = (content) => {
+    if (!content || !content.replace) return content;
+    // Parse out any cp-scaffolds
+    content = replacePostScaffolds(content);
     // Parse out any styles
     content = replaceStyles(content);
     // Remove any React-style comments
@@ -94,6 +109,25 @@ const finalProcessMarkup = (content) => {
     // Replacements from .cpscaffold.json file
     content = utils.replaceMarkup(content);
     return trimSharedLeadingWhitespace(content);
+};
+
+const replacePreScaffolds = (content) => {
+    const scaffoldRegexs = [
+        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*else\\s*\\*\\/\\}\\s*((?:.|\\r|\\n)*?)\\s*\\{\\s*\\/\\*\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "{/* cp-pre-scaffold $1 /cp-pre-scaffold */}"},
+        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "{/* cp-pre-scaffold $1 /cp-pre-scaffold */}"}
+    ];
+    let result = content;
+    for (let j = 0, lenJ = scaffoldRegexs.length; j < lenJ; j++) {
+        let regex = new RegExp(scaffoldRegexs[j].source);
+        let match = regex.exec(result);
+        while (match) {
+            let replacement = scaffoldRegexs[j].replacement;
+            //console.log(`Replacing [${match[0]}] with [${replacement}]`);
+            result = result.replace(regex, replacement);
+            match = regex.exec(result);
+        }
+    }
+    return result;
 };
 
 const removeComments = (content) => {
@@ -105,6 +139,24 @@ const removeComments = (content) => {
         content = content.replace(commentRegexs[i], "");
     }
     return content;
+};
+
+const replacePostScaffolds = (content) => {
+    const scaffoldRegexs = [
+        { source: "\\{\\s*\\/\\*\\s*cp-pre-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-pre-scaffold\\s*\\*\\/\\}", replacement: "$1"}
+    ];
+    let result = content;
+    for (let j = 0, lenJ = scaffoldRegexs.length; j < lenJ; j++) {
+        let regex = new RegExp(scaffoldRegexs[j].source);
+        let match = regex.exec(result);
+        while (match) {
+            let replacement = scaffoldRegexs[j].replacement;
+            //console.log(`Replacing [${match[0]}] with [${replacement}]`);
+            result = result.replace(regex, replacement);
+            match = regex.exec(result);
+        }
+    }
+    return result;
 };
 
 const replaceStyles = (content) => {
