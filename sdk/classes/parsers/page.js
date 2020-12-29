@@ -90,6 +90,8 @@ const finalProcessMarkup = (content) => {
     // Remove any React-style comments
     content = removeComments(content);
     content = content.replace(/className/ig, "class");
+    // Remove any JSX Fragments
+    content = replaceJsxFragments(content);
     // Replacements from .cpscaffold.json file
     content = utils.replaceMarkup(content);
     return trimSharedLeadingWhitespace(content);
@@ -146,6 +148,12 @@ const replacePreScaffolds = (content) => {
     return result;
 };
 
+const replaceJsxFragments = (content) => {
+    const regex = /^[ \t]*<[\/]?>\r?\n?/gm;
+    content = content.replace(regex, "");
+    return content;
+};
+
 const removeComments = (content) => {
     const commentRegexs = [
         /([ \t]*)\{\s*\/\*(.|\s)*?\*\/\s*\}([ \t]*)\r?\n/ig,
@@ -183,7 +191,7 @@ const trimSharedLeadingWhitespace = (content) => {
     let maxLeader = 99;
     for (let i in lines) {
         let line = lines[i];
-        if (i == 0 || onlyWhitespace.test(line)) continue;
+        if (onlyWhitespace.test(line)) continue;
         let match = line.match(leadingWhitespace);
         if (match && match[0].length) maxLeader = Math.min(maxLeader, match[0].length);
     }
@@ -191,7 +199,7 @@ const trimSharedLeadingWhitespace = (content) => {
         const leadingWhitespaceReplacer = new RegExp(`^\\s{${maxLeader}}`);
         for (let i in lines) {
             let line = lines[i];
-            if (i == 0 || onlyWhitespace.test(line)) continue;
+            if (onlyWhitespace.test(line)) continue;
             lines[i] = line.replace(leadingWhitespaceReplacer, "");
         }
         content = lines.join('\n');
@@ -268,7 +276,7 @@ const processCmsPageReturn = (content, page, render, imports) => {
     for (let i = 0, len = parts.length; i < len; i++) {
         const part = parts[i];
         if (part.type === "ReturnStatement"
-            && part.argument.type === "JSXElement") {
+            && (part.argument.type === "JSXElement" || part.argument.type === "JSXFragment")) {
             //console.log(`Found JSX pattern ${content.slice(part.argument.start, part.argument.end)}`);
             let replacements = [];
             processCmsPagePattern(content, page, part, replacements, imports);
