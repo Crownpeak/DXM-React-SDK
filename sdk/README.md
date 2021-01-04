@@ -62,3 +62,4 @@ Data Sources**
 | 3.0.0         | 2020NOV06     | Change to asynchronous data loading, drag and drop zone governance, function components, TSX. Bug fixes. |
 | 3.0.1         | 2020NOV13     | Bug fixes for TypeScript and TSX files. |
 | 3.0.2         | 2020NOV17     | Bug fix to remove React comments before scaffolding. |
+| 3.1.0         | 2021JAN04     | Add cp-scaffold for pages, support for JSX fragments, ignore non-Crownpeak components, string replacements via .cpscaffold.json. |
