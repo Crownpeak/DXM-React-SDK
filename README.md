@@ -334,7 +334,7 @@ export default class SecondaryList extends CmsComponent
 ```
 
 ### More Complex Replacements
-If your application code is too complex for the parser to be able to extract your fields, it is possible to provide your own markup for the Component Library to use instead of your component and page code:
+If your application code is too complex for the parser to be able to extract your fields, it is possible to provide your own markup for the Component Library to use instead of your component, page and wrapper code:
 ```
 {/* cp-scaffold 
 <h2>{Heading:Text}</h2>
@@ -347,6 +347,10 @@ It is also possible to add extra markup that is not used directly in your applic
 {/* cp-scaffold 
 {SupplementaryField:Text}
 /cp-scaffold */}
+```
+When using cp-scaffold on a wrapper, you should use normal HTML comments rather than React comments, for example:
+```
+<!-- cp-scaffold {metadata} /cp-scaffold -->
 ```
 
 ### String Replacements
