@@ -66,7 +66,7 @@ const parse = (content, file) => {
                 if (result && result.content) {
                     const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser);
                     uploads = uploads.concat(processedResult.uploads);
-                    results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
+                    results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, useMetadata: result.useMetadata === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
                 }
             }
         }
@@ -221,6 +221,7 @@ const processCmsPage = (content, ast, declaration, imports) => {
             if (temp.suppressFolder) result.suppressFolder = true;
             if (temp.suppressModel) result.suppressModel = true;
             if (temp.useTmf) result.useTmf = true;
+            if (temp.useMetadata) result.useMetadata = true;
             result.wrapper = temp.wrapper;
         }
         if (part.type === "ClassMethod" && part.key.name === "render") {
@@ -233,6 +234,7 @@ const processCmsPage = (content, ast, declaration, imports) => {
 const processCmsConstructor = (content, page, ctor, imports) => {
     return { 
         useTmf: getConstructorAssignedValue(ctor, "cmsUseTmf", false),
+        useMetadata: getConstructorAssignedValue(ctor, "cmsUseMetadata", false),
         suppressFolder: getConstructorAssignedValue(ctor, "cmsSuppressFolder", false),
         suppressModel: getConstructorAssignedValue(ctor, "cmsSuppressModel", false),
         wrapper: getConstructorAssignedValue(ctor, "cmsWrapper", undefined)

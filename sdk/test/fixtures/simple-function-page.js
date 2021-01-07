@@ -8,6 +8,7 @@ export default function SimplePage(props)
     var cmsSuppressFolder = true;
     var cmsSuppressModel = true;
     var cmsUseTmf = true;
+    var cmsUseMetadata = true;
     var cmsWrapper = "SimpleWrapper";
     
     return (

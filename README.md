@@ -85,6 +85,7 @@ export default class BlogPage extends CmsStaticPage
         super(props);
         this.cmsWrapper = "";           //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
         this.cmsUseTmf = false;         //set to true to create templates that use the Translation Model Framework.
+        this.cmsUseMetadata = false;    //set to true to create templates that include the standard MetaData component.
         this.cmsSuppressModel = false;  //set to true to suppress model and content folder creation when scaffolding.
         this.cmsSuppressFolder = false; //set to true to suppress content folder creation when scaffolding.
         if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
@@ -151,6 +152,7 @@ export default class BlogPage extends CmsDynamicPage
         super(props);
         this.cmsWrapper = "";           //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
         this.cmsUseTmf = false;         //set to true to create templates that use the Translation Model Framework.
+        this.cmsUseMetadata = false;    //set to true to create templates that include the standard MetaData component.
         this.cmsSuppressModel = false;  //set to true to suppress model and content folder creation when scaffolding.
         this.cmsSuppressFolder = false; //set to true to suppress content folder creation when scaffolding.
         if(this.props && this.props.location) this.cmsAssetId = Routing.getCmsAssetId(this.props.location.pathname);
@@ -208,6 +210,7 @@ export default function BlogPage()
     let isLoaded = CmsStaticPage.load(12345, useState, useEffect); // Or use CmsDynamicPage
     const cmsWrapper = "";           //insert Wrapper Name from data-cms-wrapper-name in HTML, or don't include property to accept defaults.
     const cmsUseTmf = false;         //set to true to create templates that use the Translation Model Framework.
+    const cmsUseMetadata = false;    //set to true to create templates that include the standard MetaData component.
     const cmsSuppressModel = false;  //set to true to suppress model and content folder creation when scaffolding.
     const cmsSuppressFolder = false; //set to true to suppress content folder creation when scaffolding.
 
@@ -473,13 +476,14 @@ export default class TopicList extends CmsComponent
 There are a number of options that can be specified on the constructor of an item that extends CmsPage.
 These are set as properties on the extending class. For example:
 ```
-this.useTmf = true;
+this.cmsUseTmf = true;
 ```
 | Property       | Description |
 | -------------- | ----------- |
-| useTmf         | If set, the resulting template will use the Translation Model Framework (TMF). Defaults to false. |
-| suppressModel  | If set, no model will be created for the resulting template. Defaults to false. |
-| suppressFolder | If set (or if suppressModel is set), no content folder will be created for the resulting model. Defaults to false. |
+| cmsUseTmf      | If set, the resulting template will use the Translation Model Framework (TMF). Defaults to false. |
+| cmsUseMetadata | If set, the resulting template will include the standard MetaData component. Defaults to false. |
+| cmsSuppressModel  | If set, no model will be created for the resulting template. Defaults to false. |
+| cmsSuppressFolder | If set (or if cmsSuppressModel is set), no content folder will be created for the resulting model. Defaults to false. |
 
 ---
 

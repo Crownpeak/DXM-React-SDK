@@ -68,7 +68,7 @@ const parse = (content, file) => {
                 if (result && result.content) {
                     const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser);
                     uploads = uploads.concat(processedResult.uploads);
-                    results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
+                    results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, useMetadata: result.useMetadata === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
                 }
             }
         }
@@ -83,7 +83,7 @@ const parse = (content, file) => {
             if (result && result.content) {
                 const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser);
                 uploads = uploads.concat(processedResult.uploads);
-                results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
+                results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, useMetadata: result.useMetadata === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
             }
         }
     }
@@ -234,6 +234,7 @@ const processCmsPage = (content, ast, declaration, imports) => {
     if (temp.suppressFolder) result.suppressFolder = true;
     if (temp.suppressModel) result.suppressModel = true;
     if (temp.useTmf) result.useTmf = true;
+    if (temp.useMetadata) result.useMetadata = true;
     result.wrapper = temp.wrapper;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
@@ -247,6 +248,7 @@ const processCmsPage = (content, ast, declaration, imports) => {
 const processCmsFunction = (page, imports) => {
     return { 
         useTmf: getFunctionAssignedValue(page, "cmsUseTmf", false),
+        useMetadata: getFunctionAssignedValue(page, "cmsUseMetadata", false),
         suppressFolder: getFunctionAssignedValue(page, "cmsSuppressFolder", false),
         suppressModel: getFunctionAssignedValue(page, "cmsSuppressModel", false),
         wrapper: getFunctionAssignedValue(page, "cmsWrapper", undefined)
