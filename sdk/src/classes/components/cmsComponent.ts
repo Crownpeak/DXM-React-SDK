@@ -4,6 +4,7 @@ import CmsCore from "../common/cmsCore";
 export default class CmsComponent extends CmsCore {
     cmsFolder?: string = "";
     cmsZones?: string[] = [];
+    cmsDisableDragDrop?: boolean = false;
     constructor(props: any) {
         super(props);
         CmsDataCache.cmsComponentName = this.constructor.name;

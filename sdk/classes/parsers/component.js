@@ -75,7 +75,7 @@ const parse = (content, file) => {
                 if (result) {
                     const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser, true);
                     uploads = uploads.concat(processedResult.uploads);
-                    results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, dependencies: dependencies});
+                    results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, disableDragDrop: result.disableDragDrop, dependencies: dependencies});
                 }
             }
         }
@@ -256,6 +256,7 @@ const processCmsComponent = (content, ast, declaration, imports, dependencies) =
             const temp = processCmsConstructor(content, declaration, part, imports);
             if (temp.folder) result.folder = temp.folder;
             if (temp.zones) result.zones = typeof(temp.zones) === "string" ? temp.zones.split(",") : temp.zones;
+            if (typeof temp.disableDragDrop !== "undefined") result.disableDragDrop = temp.disableDragDrop;
         }
         if (part.type === "ClassMethod" && part.key.name === "render") {
             result.content = processCmsComponentReturn(content, declaration, part, imports, dependencies);
@@ -267,7 +268,8 @@ const processCmsComponent = (content, ast, declaration, imports, dependencies) =
 const processCmsConstructor = (content, page, ctor, imports) => {
     return { 
         folder: getConstructorAssignedValue(ctor, "cmsFolder", ""),
-        zones: getConstructorAssignedValue(ctor, "cmsZones", "")
+        zones: getConstructorAssignedValue(ctor, "cmsZones", ""),
+        disableDragDrop: getConstructorAssignedValue(ctor, "cmsDisableDragDrop", undefined)
     };
 };
 

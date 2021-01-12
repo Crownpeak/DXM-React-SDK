@@ -241,6 +241,7 @@ export default class BlogPost extends CmsComponent
         this.post_category = new CmsField("Post_Category", CmsFieldTypes.DOCUMENT);
         this.cmsFolder = ""; //set the subfolder in which the component will be created when scaffolding.
         this.cmsZones = []; //set the zones into which the component is permitted to be dropped.
+        this.cmsDisableDragDrop = false; // set to true to hide this component from drag and drop.
     }
 
     render() {
@@ -268,6 +269,7 @@ export default function BlogPost(props)
     CmsDataCache.setComponent("BlogPost");
     const cmsFolder = ""; //set the subfolder in which the component will be created when scaffolding.
     const cmsZones = []; //set the zones into which the component is permitted to be dropped.
+    const cmsDisableDragDrop = false; // set to true to hide this component from drag and drop.
 
     var heading = new CmsField("Heading", CmsFieldTypes.TEXT);
     var description = new CmsField("Description", CmsFieldTypes.WYSIWYG);

@@ -79,7 +79,7 @@ const parse = (content, file) => {
                 if (result) {
                     const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser, true);
                     uploads = uploads.concat(processedResult.uploads);
-                    results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, dependencies: dependencies});
+                    results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, disableDragDrop: result.disableDragDrop, dependencies: dependencies});
                 }
             }
             else if (part.declaration.type === "VariableDeclaration") {
@@ -99,7 +99,7 @@ const parse = (content, file) => {
                     if (result) {
                         const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser, true);
                         uploads = uploads.concat(processedResult.uploads);
-                        results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, dependencies: dependencies});
+                        results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, disableDragDrop: result.disableDragDrop, dependencies: dependencies});
                     }
                 }
             }
@@ -118,7 +118,7 @@ const parse = (content, file) => {
             if (result) {
                 const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser, true);
                 uploads = uploads.concat(processedResult.uploads);
-                results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, dependencies: dependencies});
+                results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, disableDragDrop: result.disableDragDrop, dependencies: dependencies});
             }
         }
         else if (part.type === "VariableDeclaration") {
@@ -138,7 +138,7 @@ const parse = (content, file) => {
                 if (result) {
                     const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser, true);
                     uploads = uploads.concat(processedResult.uploads);
-                    results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, dependencies: dependencies});
+                    results.push({name: name, content: processedResult.content, folder: result.folder, zones: result.zones, disableDragDrop: result.disableDragDrop, dependencies: dependencies});
                 }
             }
         }
@@ -316,6 +316,7 @@ const processCmsComponent = (content, ast, declaration, imports, dependencies) =
     const temp = processCmsFunction(declaration, imports);
     if (temp.folder) result.folder = temp.folder;
     if (temp.zones) result.zones = typeof(temp.zones) === "string" ? temp.zones.split(",") : temp.zones;
+    if (typeof temp.disableDragDrop !== "undefined") result.disableDragDrop = temp.disableDragDrop;
     const bodyParts = declaration.body.body;
     for (let i = 0, len = bodyParts.length; i < len; i++) {
         const part = bodyParts[i];
@@ -329,7 +330,8 @@ const processCmsComponent = (content, ast, declaration, imports, dependencies) =
 const processCmsFunction = (component, imports) => {
     return { 
         folder: getFunctionAssignedValue(component, "cmsFolder", ""),
-        zones: getFunctionAssignedValue(component, "cmsZones", "")
+        zones: getFunctionAssignedValue(component, "cmsZones", ""),
+        disableDragDrop: getFunctionAssignedValue(component, "cmsDisableDragDrop", undefined)
     };
 };
 
