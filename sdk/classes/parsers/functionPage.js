@@ -17,7 +17,7 @@ const parse = (content, file) => {
 
     let ast = babelParser.parse(content, {
         sourceType: "module",
-        plugins: ["jsx"]
+        plugins: ["jsx", "typescript"]
     });
     //console.log(JSON.stringify(ast));
     if (ast.errors && ast.errors.length > 0) {
