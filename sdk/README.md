@@ -66,4 +66,4 @@ Data Sources**
 | 3.2.0         | 2021JAN07     | Add cp-scaffold for wrappers, option to include metadata on pages, $file macro in CMS_STATIC_CONTENT_LOCATION. |
 | 3.2.1         | 2021JAN08     | Extra macro option using {file} in CMS_STATIC_CONTENT_LOCATION. |
 | 3.2.2         | 2021JAN11     | CmsCore change to help with TypeScript for DropZone. |
-| 3.2.3         | 2021JAN13     | Add missing "typescript" option to the functional page parser. |
+| 3.3.0         | 2021JAN13     | Add cmsDisableDragDrop option to mark components unsuitable for Drag and Drop, and bug fix. |
