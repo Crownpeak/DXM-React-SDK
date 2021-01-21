@@ -223,6 +223,41 @@ export default function BlogPage()
 }
 ```
 
+### Data Timeouts
+If you wish to limit the time available for your page to load its data, you can specify a timeout in milliseconds like this:.
+```
+this.cmsLoadDataTimeout = 3000; // Timeout after 3 seconds
+```
+For React function components, the timeout is an optional fourth argument to the `load` method on the `CmsStaticPage` and `CmsDynamicPage` classes. For example:
+```
+let isLoaded = CmsStaticPage.load(12345, useState, useEffect, 3000);
+```
+Note that if a timeout occurs when loading dynamic data, it will automatically attempt to fall back to loading static data, with the same timeout value. If this succeeds, you will see a warning in the browser console. If it fails, the cmsDataError event will be triggered as described below, or you will see an error in the browser console.
+
+### Data Events
+If you want to know when your data has loaded, or whether an error occurred during load, you can use the following:
+```
+this.cmsDataLoaded = (data, assetId) => {
+    alert(`Loaded ${assetId}, ${JSON.stringify(data)}`);
+}; 
+this.cmsDataError = (exception, assetId) => {
+    alert(`Error ${assetId}, ${exception}`);
+};
+```
+Inside `cmsDataLoaded` it is also possible to modify or replace the loaded data. Return an object from your function to do this.
+
+For React function components, these events can be passed to the `load` method on the `CmsStaticPage` and `CmsDynamicPage` classes. For example:
+```
+const cmsDataLoaded = (data, assetId) => {
+    alert(`Loaded ${assetId}, ${JSON.stringify(data)}`);
+}; 
+const cmsDataError = (exception, assetId) => {
+    alert(`Error ${assetId}, ${exception}`);
+};
+let isLoaded = CmsStaticPage.load(12345, useState, useEffect, 3000, cmsDataLoaded, cmsDataError);
+```
+As with class-based pages, you can also modify or replace the data inside the cmsDataLoaded event by returning a new object.
+
 ### CmsComponent
 Includes CmsField references for content rendering from DXM within a React Component.:
 ```

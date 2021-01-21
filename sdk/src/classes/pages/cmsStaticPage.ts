@@ -1,5 +1,5 @@
 import CmsPage from "./cmsPage";
-import { CmsStaticDataProvider, CmsDataCache } from "crownpeak-dxm-sdk-core";
+import { CmsStaticDataProvider } from "crownpeak-dxm-sdk-core";
 
 export default class CmsStaticPage extends CmsPage {
     constructor(props: any) {
@@ -7,21 +7,11 @@ export default class CmsStaticPage extends CmsPage {
         this.cmsDataProvider = new CmsStaticDataProvider();
     }
 
-    private static async _load(assetId: number): Promise<void> {
-        await new CmsStaticDataProvider().getSingleAsset(assetId);
-        CmsDataCache.cmsAssetId = assetId;
-    }
-
-    static load(assetId: number, useState: Function, useEffect: Function): boolean {
-        let [isLoaded, setIsLoaded] = useState(false);
-        useEffect(() => {
-            this._load(assetId).then(() => setIsLoaded(true));
-        });
-        return isLoaded;
+    static load(assetId: number, useState: Function, useEffect: Function, timeout?: number, loadedCallback?: (data: object, assetId: number) => object | void, errorCallback?: (exception: any, assetId: number) => void): boolean {
+        return CmsPage.loadForProvider(new CmsStaticDataProvider(), assetId, useState, useEffect, timeout, loadedCallback, errorCallback);
     }
 
     static loadSync(assetId: number): void {
-        new CmsStaticDataProvider().getSingleAssetSync(assetId);
-        CmsDataCache.cmsAssetId = assetId;
+        CmsPage.loadForProviderSync(new CmsStaticDataProvider(), assetId);
     }
 }
