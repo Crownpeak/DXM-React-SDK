@@ -198,7 +198,8 @@ export default class BlogPage extends CmsDynamicPage
 }
 ```
 
-If you are using React function components, you must call out to a load() method on the page type for your page to be recognised and scaffolded correctly.
+If you are using React function components, you must call out to a load() method on the page type, or
+include a comment containing exactly `CmsPage` for your page to be recognised and scaffolded correctly.
 
 ```
 import React, { useState, useEffect } from 'react';
@@ -219,6 +220,14 @@ export default function BlogPage()
         <div>
             <!-- [...] -->
         </div>
+    )
+}
+
+export function PageLoadingItsOwnData() {
+    // The comment below is required for your page to be recognised by the scaffolding process.
+    // CmsPage
+    return (
+        <etc />
     )
 }
 ```
@@ -539,6 +548,7 @@ this.cmsUseTmf = true;
 | CMS_PROJECT   | DXM Project Asset Id.                                                     |
 | CMS_WORKFLOW  | DXM Workflow Id (to be applied to created Models).                        |
 | CMS_SERVER    | (Optional) Allows base Crownpeak DXM URL to be overridden.                |
+| CMS_SCAFFOLD_IGNORE | (Optional) One or more paths to ignore during scaffolding, separated by commas. |
 
 ```
 # Crownpeak DXM Configuration
@@ -551,6 +561,7 @@ CMS_PROJECT={Replace with Asset Id of Project}
 CMS_WORKFLOW={Replace with Workflow Id}
 CMS_STATIC_CONTENT_LOCATION=/content/json
 CMS_DYNAMIC_CONTENT_LOCATION=//searchg2.crownpeak.net/{Replace with Search G2 Collection Name}/select/?wt=json
+CMS_SCAFFOLD_IGNORE=build,.cache
 ```
 
 Installation instructions:
