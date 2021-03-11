@@ -8,7 +8,7 @@ const wrapperParser = require("./wrapper");
 const reComponent = new RegExp("class .*? extends CmsComponent");
 const reFunctionComponent = new RegExp("CmsDataCache.setComponent\\s*\\(");
 const rePage = new RegExp("class .*? extends Cms(Dynamic|Static)Page");
-const reFunctionPage = new RegExp("Cms(Dynam|Stat)icPage.load(?:Sync)?\\s*\\(");
+const reFunctionPage = new RegExp("(Cms(Dynam|Stat)icPage.load(?:Sync)?\\s*\\()|(\\/\\/\\s*CmsPage)|(\\/\\*\\s*CmsPage\\s*\\*\\/)");
 const reWrapper = new RegExp("data-cms-wrapper-name=");
 
 const process = (file) => {

@@ -6,8 +6,8 @@ const utils = require("crownpeak-dxm-sdk-core/lib/crownpeak/utils");
 const extensions = [".js", ".ts", ".jsx", ".tsx"];
 const reStyle = /\sstyle\s*=\s*(\{+[^}]+\}+)/i;
 const reStyleRule = /([^:\s]+)\s*:\s*(['"]?)([^"',]+)\2/ig;
+const cmsPageComment = "CmsPage";
 
-let _pageName = "";
 let _fileName = "";
 
 const parse = (content, file) => {
@@ -58,10 +58,12 @@ const parse = (content, file) => {
         const part = bodyParts[i];
         if (part.type === "ExportDefaultDeclaration" || part.type === "ExportNamedDeclaration") {
             if (part.declaration.type === "FunctionDeclaration"
-                && part.declaration.body.body.some(p => p.type === "VariableDeclaration"
+                && (bodyHasCmsPageComment(part.declaration.body, ast.comments)
+                || (part.declaration.body.body.some(p => p.type === "VariableDeclaration"
                     && p.declarations.some(d => d.init.type === "CallExpression"
                         && d.init.callee && d.init.callee.object
-                        && ["CmsStaticPage","CmsDynamicPage"].indexOf(d.init.callee.object.name > -1)))) {
+                        && ["CmsStaticPage","CmsDynamicPage"].indexOf(d.init.callee.object.name > -1)))))) {
+                // export [default] name() { ... }
                 //console.log(`Found exported function ${part.declaration.id.name} as a CmsPage`);
                 const name = part.declaration.id.name;
                 const result = processCmsPage(content, ast, part.declaration, imports);
@@ -71,12 +73,49 @@ const parse = (content, file) => {
                     results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, useMetadata: result.useMetadata === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
                 }
             }
+            else if (part.declaration.type === "AssignmentExpression"
+                && (bodyHasCmsPageComment(part.declaration.right.body, ast.comments)
+                || (part.declaration.right.body.body.some(p => p.type === "VariableDeclaration"
+                    && p.declarations.some(d => d.init.type === "CallExpression"
+                        && d.init.callee && d.init.callee.object
+                        && ["CmsStaticPage","CmsDynamicPage"].indexOf(d.init.callee.object.name > -1)))))) {
+                // export default name = () => { ... }
+                //console.log(`Found exported arrow function 1 ${part.declaration.left.name} as a CmsPage`);
+                const name = part.declaration.left.name;
+                const result = processCmsPage(content, ast, part.declaration, imports);
+                if (result && result.content) {
+                    const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser);
+                    uploads = uploads.concat(processedResult.uploads);
+                    results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, useMetadata: result.useMetadata === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
+                }
+            }
+            else if (part.declaration.type === "VariableDeclaration"
+                && part.declaration.declarations && part.declaration.declarations.length
+                && part.declaration.declarations[0].type === "VariableDeclarator"
+                && part.declaration.declarations[0].init && part.declaration.declarations[0].init.type === "ArrowFunctionExpression"
+                && (bodyHasCmsPageComment(part.declaration.declarations[0].init.body, ast.comments)
+                || (part.declaration.declarations[0].init.body.body.some(p => p.type === "VariableDeclaration"
+                    && p.declarations.some(d => d.init.type === "CallExpression"
+                        && d.init.callee && d.init.callee.object
+                        && ["CmsStaticPage","CmsDynamicPage"].indexOf(d.init.callee.object.name > -1)))))) {
+                // export const name = () => { ... }
+                //console.log(`Found exported arrow function 2 ${part.declaration.declarations[0].id.name} as a CmsPage`);
+                const name = part.declaration.declarations[0].id.name;
+                const result = processCmsPage(content, ast, part.declaration.declarations[0], imports);
+                if (result && result.content) {
+                    const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser);
+                    uploads = uploads.concat(processedResult.uploads);
+                    results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, useMetadata: result.useMetadata === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
+                }
+            }
         }
         else if (part.type === "FunctionDeclaration"
-            && part.body.body.some(p => p.type === "VariableDeclaration"
+            && (bodyHasCmsPageComment(part.body, ast.comments)
+            || (part.body.body.some(p => p.type === "VariableDeclaration"
                 && p.declarations.some(d => d.init.type === "CallExpression"
                     && d.init.callee && d.init.callee.object
-                    && ["CmsStaticPage","CmsDynamicPage"].indexOf(d.init.callee.object.name > -1)))) {
+                    && ["CmsStaticPage","CmsDynamicPage"].indexOf(d.init.callee.object.name > -1)))))) {
+            // function name() { ... }
             //console.log(`Found function ${part.id.name} as a CmsPage`);
             const name = part.id.name;
             const result = processCmsPage(content, ast, part, imports);
@@ -86,8 +125,34 @@ const parse = (content, file) => {
                 results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, useMetadata: result.useMetadata === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
             }
         }
+        else if (part.type === "VariableDeclaration"
+            && part.declarations && part.declarations.length
+            && part.declarations[0].type === "VariableDeclarator"
+            && part.declarations[0].init && part.declarations[0].init.type === "ArrowFunctionExpression"
+            && (bodyHasCmsPageComment(part.declarations[0].init.body, ast.comments)
+            || (part.declarations[0].init.body.body.some(p => p.type === "VariableDeclaration"
+                && p.declarations.some(d => d.init.type === "CallExpression"
+                    && d.init.callee && d.init.callee.object
+                    && ["CmsStaticPage","CmsDynamicPage"].indexOf(d.init.callee.object.name > -1)))))) {
+            // const name = () => { ... }
+            //console.log(`Found arrow function ${part.declarations[0].id.name} as a CmsPage`);
+            const name = part.declarations[0].id.name;
+            const result = processCmsPage(content, ast, part.declarations[0], imports);
+            if (result && result.content) {
+                const processedResult = utils.replaceAssets(file, finalProcessMarkup(result.content), cssParser);
+                uploads = uploads.concat(processedResult.uploads);
+                results.push({name: name, content: processedResult.content, wrapper: result.wrapper, useTmf: result.useTmf === true, useMetadata: result.useMetadata === true, suppressFolder: result.suppressFolder === true, suppressModel: result.suppressModel === true});
+            }
+        }
     }
     return { pages: results, uploads: uploads };
+};
+
+const bodyHasCmsPageComment = (body, comments) => {
+    // See if any CmsPage comment is contained within our function body
+    return comments.some(comment =>
+        comment.value.replace(/\s+/g, "") === cmsPageComment && comment.start >= body.start && comment.end <= body.end
+    );
 };
 
 const initialProcessMarkup = (content) => {
@@ -226,8 +291,9 @@ const trimSharedLeadingWhitespace = (content) => {
 };
 
 const processCmsPage = (content, ast, declaration, imports) => {
-    _pageName = declaration.id.name;
     //console.log(`Processing CmsPage ${declaration.id.name}`);
+    if (declaration.init) declaration = declaration.init;
+    else if (declaration.right) declaration = declaration.right;
     const bodyParts = declaration.body.body;
     let result = {};
     const temp = processCmsFunction(declaration, imports);
