@@ -548,7 +548,7 @@ this.cmsUseTmf = true;
 | CMS_PROJECT   | DXM Project Asset Id.                                                     |
 | CMS_WORKFLOW  | DXM Workflow Id (to be applied to created Models).                        |
 | CMS_SERVER    | (Optional) Allows base Crownpeak DXM URL to be overridden.                |
-| CMS_SCAFFOLD_IGNORE | (Optional) One or more paths to ignore during scaffolding, separated by commas. |
+| CMS_SCAFFOLD_IGNORE | (Optional) One or more paths to ignore during scaffolding, separated by commas. Paths are resolved relative to the application root. |
 
 ```
 # Crownpeak DXM Configuration
