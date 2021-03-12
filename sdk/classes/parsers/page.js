@@ -4,8 +4,7 @@ const path = require('path');
 const cssParser = require("./css");
 const utils = require("crownpeak-dxm-sdk-core/lib/crownpeak/utils");
 const extensions = [".js", ".ts", ".jsx", ".tsx"];
-const reStyle = /\sstyle\s*=\s*(\{+[^}]+\}+)/i;
-const reStyleRule = /([^:\s]+)\s*:\s*(['"]?)([^"',]+)\2/ig;
+const reactUtils = require("../utils/utils");
 
 let _pageName = "";
 let _fileName = "";
@@ -88,47 +87,15 @@ const finalProcessMarkup = (content) => {
     // Parse out any cp-scaffolds
     content = replacePostScaffolds(content);
     // Parse out any styles
-    content = replaceStyles(content);
+    content = reactUtils.replaceStyles(content);
     // Remove any React-style comments
-    content = removeComments(content);
+    content = reactUtils.removeComments(content);
     content = content.replace(/className/ig, "class");
     // Remove any JSX Fragments
-    content = replaceJsxFragments(content);
+    content = reactUtils.replaceJsxFragments(content);
     // Replacements from .cpscaffold.json file
     content = utils.replaceMarkup(content);
-    return trimSharedLeadingWhitespace(content);
-};
-
-const replaceStyles = (content) => {
-    let match = reStyle.exec(content);
-    while (match) {
-        const style = match[1];
-        let replacements = [];
-        //console.log("Found style ${style}");
-        if (style.substr(0, 2) === "{{" && style.slice(-2) === "}}") {
-            let ruleMatch = reStyleRule.exec(style.slice(2, style.length - 2));
-            while (ruleMatch) {
-                replacements.push(`${camelCaseToDashes(ruleMatch[1])}: ${prepareCssValue(ruleMatch[1], ruleMatch[3])}`);
-                ruleMatch = reStyleRule.exec(style.slice(2, style.length - 2));
-            }
-        } else {
-            // TODO: support other JSX style definition formats
-        }
-        content = content.replace(match[0], ` style='${replacements.join("; ")}'`);
-        match = reStyle.exec(content);
-    }
-    return content;
-};
-
-const camelCaseToDashes = (str) => {
-    return str.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`);
-};
-
-const prepareCssValue = (key, value) => {
-    if (["animationIterationCount","borderImageOutset","borderImageSlice","borderImageWidth","boxFlex","boxFlexGroup","boxOrdinalGroup","columnCount","columns","flex","flexGrow","flexPositive","flexShrink","flexNegative","flexOrder","gridRow","gridRowEnd","gridRowSpan","gridRowStart","gridColumn","gridColumnEnd","gridColumnSpan","gridColumnStart","fontWeight","lineClamp","lineHeight","opacity","order","orphans","tabSize","widows","zIndex","zoom","fillOpacity","floodOpacity","stopOpacity","strokeDasharray","strokeDashoffset","strokeMiterlimit","strokeOpacity","strokeWidth"]
-        .indexOf(key) < 0
-        && (/^[0-9]+$/.test(value))) return value + "px";
-    return value;
+    return reactUtils.trimSharedLeadingWhitespace(content);
 };
 
 const replacePreScaffolds = (content) => {
@@ -150,23 +117,6 @@ const replacePreScaffolds = (content) => {
     return result;
 };
 
-const replaceJsxFragments = (content) => {
-    const regex = /^[ \t]*<[\/]?>\r?\n?/gm;
-    content = content.replace(regex, "");
-    return content;
-};
-
-const removeComments = (content) => {
-    const commentRegexs = [
-        /([ \t]*)\{\s*\/\*(.|\s)*?\*\/\s*\}([ \t]*)\r?\n/ig,
-        /\{\s*\/\*(.|\s)*?\*\/\s*\}/ig
-    ];
-    for (let i = 0, len = commentRegexs.length; i < len; i++) {
-        content = content.replace(commentRegexs[i], "");
-    }
-    return content;
-};
-
 const replacePostScaffolds = (content) => {
     const scaffoldRegexs = [
         { source: "\\{\\s*\\/\\*\\s*cp-pre-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-pre-scaffold\\s*\\*\\/\\}", replacement: "$1"}
@@ -183,30 +133,6 @@ const replacePostScaffolds = (content) => {
         }
     }
     return result;
-};
-
-const trimSharedLeadingWhitespace = (content) => {
-    // Trim leading whitespace common to all lines except blanks
-    const onlyWhitespace = /^\s*$/;
-    const leadingWhitespace = /^\s*/;
-    let lines = content.split(`\n`);
-    let maxLeader = 99;
-    for (let i in lines) {
-        let line = lines[i];
-        if (onlyWhitespace.test(line)) continue;
-        let match = line.match(leadingWhitespace);
-        if (match && match[0].length) maxLeader = Math.min(maxLeader, match[0].length);
-    }
-    if (maxLeader > 0) {
-        const leadingWhitespaceReplacer = new RegExp(`^\\s{${maxLeader}}`);
-        for (let i in lines) {
-            let line = lines[i];
-            if (onlyWhitespace.test(line)) continue;
-            lines[i] = line.replace(leadingWhitespaceReplacer, "");
-        }
-        content = lines.join('\n');
-    }
-    return content;
 };
 
 const processCmsPage = (content, ast, declaration, imports) => {
