@@ -37,6 +37,10 @@ const processCommand = (options) => {
     for (let f in jsfiles) {
         //console.log(`Processing ${jsfiles[f]}`);
         let result = parser.process(jsfiles[f]);
+        if (result.wrapper) {
+            //console.log(`Found wrapper ${JSON.stringify(result.wrapper)}`);
+            wrappers.push(result.wrapper);
+        }
         if (result.components) {
             //console.log(`Found component definitions ${JSON.stringify(result.components)}`);
             components = components.concat(result.components);
