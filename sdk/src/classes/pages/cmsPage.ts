@@ -12,11 +12,13 @@ export default class CmsPage extends CmsCore {
     state = { isLoaded: false };
     cmsDataLoaded?: (data: object, assetId: number) => object;
     cmsDataError?: (exception: any, assetId: number) => void;
+    cmsBeforeLoadingData?: (options: XMLHttpRequest | RequestInit) => void;
 
-    protected static loadForProvider(provider: ICmsDataProvider, assetId: number, useState: Function, useEffect: Function, timeout?: number, loadedCallback?: (data: object, assetId: number) => object | void, errorCallback?: (exception: any, assetId: number) => void): boolean {
+    protected static loadForProvider(provider: ICmsDataProvider, assetId: number, useState: Function, useEffect: Function, timeout?: number, loadedCallback?: (data: object, assetId: number) => object | void, errorCallback?: (exception: any, assetId: number) => void, beforeLoadingCallback?: (options: XMLHttpRequest | RequestInit) => void): boolean {
         let [isLoaded, setIsLoaded] = useState(false);
         useEffect(() => {
             let isError = false;
+            provider.setPreLoad(beforeLoadingCallback);
             provider.getSingleAsset(assetId, timeout).catch((ex) => {
                 isError = true;
                 if (errorCallback) errorCallback(ex, assetId);
@@ -32,7 +34,8 @@ export default class CmsPage extends CmsCore {
         return isLoaded;
     }
 
-    protected static loadForProviderSync(provider: ICmsDataProvider, assetId: number): void {
+    protected static loadForProviderSync(provider: ICmsDataProvider, assetId: number, beforeLoadingCallback?: (options: XMLHttpRequest | RequestInit) => void): void {
+        provider.setPreLoad(beforeLoadingCallback);
         provider.getSingleAssetSync(assetId);
         CmsDataCache.cmsAssetId = assetId;
     }
@@ -42,6 +45,7 @@ export default class CmsPage extends CmsCore {
         if (this.state.isLoaded) return null;
         const that = this;
         let isError = false;
+        this.cmsDataProvider.setPreLoad(this.cmsBeforeLoadingData);
         this.cmsDataProvider.getSingleAsset(this.cmsAssetId, this.cmsLoadDataTimeout).catch((ex) => {
             isError = true;
             if (that.cmsDataError) that.cmsDataError(ex, that.cmsAssetId);
