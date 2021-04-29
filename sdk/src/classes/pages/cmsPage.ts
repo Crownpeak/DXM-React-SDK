@@ -29,7 +29,7 @@ export default class CmsPage extends CmsCore {
                     setIsLoaded(true);
                 }
             });
-        });
+        }, [assetId, timeout, loadedCallback, errorCallback]);
         CmsDataCache.cmsAssetId = assetId;
         return isLoaded;
     }
