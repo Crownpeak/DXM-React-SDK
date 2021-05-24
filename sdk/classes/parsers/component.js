@@ -106,7 +106,9 @@ const finalProcessMarkup = (content) => {
 const replacePreScaffolds = (content) => {
     const scaffoldRegexs = [
         { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*else\\s*\\*\\/\\}\\s*((?:.|\\r|\\n)*?)\\s*\\{\\s*\\/\\*\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "{/* cp-pre-scaffold $1 /cp-pre-scaffold */}"},
-        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "{/* cp-pre-scaffold $1 /cp-pre-scaffold */}"}
+        { source: "\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*else\\s*\\*\\/\\s*((?:.|\\r|\\n)*?)\\s*\\/\\*\\s*\\/cp-scaffold\\s*\\*\\/", replacement: "/* cp-pre-scaffold $1 /cp-pre-scaffold */"},
+        { source: "\\{\\s*\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-scaffold\\s*\\*\\/\\}", replacement: "{/* cp-pre-scaffold $1 /cp-pre-scaffold */}"},
+        { source: "\\/\\*\\s*cp-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-scaffold\\s*\\*\\/", replacement: "/* cp-pre-scaffold $1 /cp-pre-scaffold */"}
     ];
     let result = content;
     for (let j = 0, lenJ = scaffoldRegexs.length; j < lenJ; j++) {
@@ -124,7 +126,8 @@ const replacePreScaffolds = (content) => {
 
 const replacePostScaffolds = (content) => {
     const scaffoldRegexs = [
-        { source: "\\{\\s*\\/\\*\\s*cp-pre-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-pre-scaffold\\s*\\*\\/\\}", replacement: "$1"}
+        { source: "\\{\\s*\\/\\*\\s*cp-pre-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-pre-scaffold\\s*\\*\\/\\}", replacement: "$1"},
+        { source: "\\/\\*\\s*cp-pre-scaffold\\s*((?:.|\\r|\\n)*?)\\s*\\/cp-pre-scaffold\\s*\\*\\/", replacement: "$1"}
     ];
     let result = content;
     for (let j = 0, lenJ = scaffoldRegexs.length; j < lenJ; j++) {
