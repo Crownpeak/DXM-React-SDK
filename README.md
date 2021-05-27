@@ -663,7 +663,7 @@ These are intended to improve performance for multiple runs, and you should expe
 ```
 
 ## Videos & Tutorials
-Walk through of creating /examples/bootstrap-homepage from scratch, starting with an empty folder.
+Walk through of creating Crownpeak's Demo Site (Procam) from scratch, starting with an empty folder.
 <a href="https://www.youtube.com/watch?v=MOUZIQjWvaU" target="_blank">![Crownpeak DXM SDK for React Video](./images/crownpeak-dxm-sdk-for-react-title-frame.png?raw=true "Crownpeak DXM SDK for React Video")</a>
 
 
