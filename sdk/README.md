@@ -69,3 +69,4 @@ Data Sources**
 | 3.3.0         | 2021JAN13     | Add cmsDisableDragDrop option to mark components unsuitable for Drag and Drop, and bug fix. |
 | 3.4.0         | 2021MAR15     | Updates to support Gatsby, bug fixes. |
 | 3.5.0         | 2021OCT15     | Template Builder supports default template files, react comments allowed inside an element, bug fixes. |
+| 3.5.1         | 2021OCT27     | Bug fix for error when updating a model inside a project branch. |
