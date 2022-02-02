@@ -2,7 +2,7 @@ import { CmsDataCache, ICmsDataProvider, CmsNullDataProvider } from 'crownpeak-d
 import * as React from 'react';
 import IDropZoneProps from '../components/IDropZoneProps';
 
-export default class CmsCore extends React.Component<IDropZoneProps> {
+export default class CmsCore<T = any> extends React.Component<T> {
     cmsDataProvider: ICmsDataProvider = new CmsNullDataProvider();
     cmsAssetId: number = -1;
 

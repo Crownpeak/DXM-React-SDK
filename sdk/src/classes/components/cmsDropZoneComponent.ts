@@ -4,7 +4,7 @@ import { CmsDataCache } from 'crownpeak-dxm-sdk-core';
 import CmsComponent from './cmsComponent';
 import IDropZoneProps from './IDropZoneProps';
 
-export default class CmsDropZoneComponent extends CmsComponent {
+export default class CmsDropZoneComponent<T extends IDropZoneProps = IDropZoneProps> extends CmsComponent<T> {
     data: any[];
     components: {[key: string]: React.ClassType<any, React.Component, React.ComponentClass>} = {};
 

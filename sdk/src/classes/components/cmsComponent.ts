@@ -1,7 +1,7 @@
 import { CmsDataCache, CmsDataSource } from 'crownpeak-dxm-sdk-core';
 import CmsCore from "../common/cmsCore";
 
-export default class CmsComponent extends CmsCore {
+export default class CmsComponent<T = any> extends CmsCore<T> {
     cmsFolder?: string = "";
     cmsZones?: string[] = [];
     cmsDisableDragDrop?: boolean = false;
