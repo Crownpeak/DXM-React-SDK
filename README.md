@@ -671,12 +671,12 @@ Walk through of creating Crownpeak's Demo Site (Procam) from scratch, starting w
 Thanks to:
 * <a href="https://github.com/richard-lund" target="_blank">Richard Lund</a> for the refactoring;
 * <a href="https://github.com/ptylr" target="_blank">Paul Taylor</a> for a few edits ;)
- 
+* <a href="https://github.com/btcrownpeak" target="_blank">Brad Thompson</a> for more contributions
  
 ## License
 MIT License
 
-Copyright (c) 2021 Crownpeak Technology, inc.
+Copyright (c) 2022 Crownpeak Technology, inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

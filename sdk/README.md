@@ -71,3 +71,4 @@ Data Sources**
 | 3.5.0         | 2021OCT15     | Template Builder supports default template files, react comments allowed inside an element, bug fixes. |
 | 3.5.1         | 2021OCT27     | Bug fix for error when updating a model inside a project branch. |
 | 3.6.0         | 2022FEB02     | Add support for passing type arguments to CmsComponent. |
+| 4.0.0         | 2022MAY05     | Update package.json to allow newer versions of React to be used. |
