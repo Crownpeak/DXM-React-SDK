@@ -342,7 +342,12 @@ const isDropZoneComponent = (componentName, importDefinition) => {
 
 const getSource = (source) => {
     source = path.resolve(path.dirname(_fileName), source);
-    if (fs.existsSync(source)) return fs.readFileSync(source);
+    if (fs.existsSync(source)) {
+        if (fs.lstatSync(source).isFile()) return fs.readFileSync(source);
+        // This is a directory, so look for an index.js or index.ts file within
+        const indexFile = fs.readdirSync(source).find(f => f.toLocaleLowerCase() === "index.js" || f.toLocaleLowerCase() === "index.ts");
+        if (indexFile) return path.resolve(source, indexFile);
+    }
 
     for (let i in extensions) {
         const ext = extensions[i];
