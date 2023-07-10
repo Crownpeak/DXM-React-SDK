@@ -73,3 +73,4 @@ Data Sources**
 | 3.6.0         | 2022FEB02     | Add support for passing type arguments to CmsComponent. |
 | 4.0.0         | 2022MAY05     | Update package.json to allow newer versions of React to be used. |
 | 4.0.1         | 2022JUL28     | Update page parsers to support components living in subfolders. |
+| 4.1.0         | 2023-07-10    | Bump DXM SDK Core version to remove vulnerable dependencies. |
